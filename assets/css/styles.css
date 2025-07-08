@@ -167,6 +167,50 @@ body {
   margin: 1.5rem 0; /* Prioritizing larger margin */
 }
 
+/* FontAwesome Icon Spacing Improvements */
+.fas, .far, .fab {
+  margin-right: 0.8rem;
+}
+
+/* Specific spacing for buttons with icons */
+button .fas,
+button .far, 
+button .fab {
+  margin-right: 1rem;
+}
+
+/* Spacing for icons in dropdown items */
+.dropdown-item .fas,
+.dropdown-item .far,
+.dropdown-item .fab {
+  margin-right: 1.2rem;
+  width: 1.8rem;
+  text-align: center;
+}
+
+/* Spacing for icons in feature lists */
+.theme-feature .fas,
+.theme-feature .far,
+.theme-feature .fab {
+  margin-right: 1rem;
+  width: 2rem;
+  text-align: center;
+}
+
+/* Spacing for icons in tab buttons */
+.theme-tab-btn .fas,
+.theme-tab-btn .far,
+.theme-tab-btn .fab {
+  margin-right: 0.8rem;
+}
+
+/* Spacing for icons in headers */
+.preview-header .fas,
+.preview-header .far,
+.preview-header .fab {
+  margin-right: 1rem;
+}
+
 /* Main Layout */
 .wizard-container {
   display: flex;
@@ -1228,7 +1272,10 @@ body {
 }
 
 /* Custom Scrollbar */
-.wizard-sidebar::-webkit-scrollbar,
+.wizard-sidebar::-webkit-scrollbar {
+  width: 0; /* Hide sidebar scrollbar completely */
+}
+
 .wizard-content::-webkit-scrollbar,
 .wizard-main::-webkit-scrollbar {
   width: 1rem;
@@ -1276,9 +1323,9 @@ body {
 .modal-content {
   background: #fff;
   border-radius: 2rem;
-  max-width: 120rem;
+  max-width: 140rem; /* Increased from 120rem for wider modal */
   max-height: 90vh;
-  width: 95%;
+  width: 98%; /* Increased from 95% for better space utilization */
   overflow: hidden;
   position: relative;
   box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.3);
@@ -1305,10 +1352,20 @@ body {
   color: #666;
   cursor: pointer;
   transition: all 0.3s ease;
+  padding: 0.5rem;
+  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto; /* Ensure it stays on the right */
 }
 
 .modal-close:hover {
   color: #ff7101;
+  background: rgba(255, 113, 1, 0.1);
+  transform: scale(1.1);
 }
 
 .modal-body {
@@ -1343,6 +1400,11 @@ body {
 .theme-tab-btn:hover {
   background: rgba(255, 113, 1, 0.05);
   color: #ff7101;
+}
+
+/* Initially hide styling tab button until theme is selected */
+.theme-tab-btn[onclick*="styling"] {
+  display: none;
 }
 
 .theme-tab-content {
@@ -1489,7 +1551,7 @@ body {
 }
 
 .color-value {
-  font: 500 1.4rem/1 "Montserrat", sans-serif;
+  font: 500 1.6rem/1 "Montserrat", sans-serif; /* Increased from 1.4rem to 1.6rem */
   color: #666;
   background: #fff;
   border: 1px solid rgba(0, 155, 222, 0.2);
@@ -1568,12 +1630,18 @@ body {
   }
 
   .user-info {
-    display: none; /* Hide user info on smaller screens */
+    display: flex; /* Show user info on mobile but adjust layout */
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    font-size: 1.2rem; /* Smaller font on mobile */
   }
 
   .user-dropdown {
-    right: -10rem; /* Adjusted for smaller screens */
-    width: 20rem;
+    right: -5rem; /* Better positioning for mobile */
+    width: 22rem;
+    left: auto;
+    transform: translateX(0);
   }
 
   .modal-content {
