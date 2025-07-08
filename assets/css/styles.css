@@ -167,14 +167,9 @@ body {
   margin: 1.5rem 0; /* Prioritizing larger margin */
 }
 
-/* FontAwesome Icon Spacing Improvements */
-.fas, .far, .fab {
-  margin-right: 0.8rem;
-}
-
 /* Specific spacing for buttons with icons */
 button .fas,
-button .far, 
+button .far,
 button .fab {
   margin-right: 1rem;
 }
@@ -224,7 +219,8 @@ button .fab {
   padding: 5rem 3rem;
   border-right: 0.2rem solid rgba(0, 155, 222, 0.1);
   overflow-y: auto;
-  height: 100%; /* Take full height of wizard-container */
+  /* height: 100%; Take full height of wizard-container */
+  height: calc(100vh - 10rem);
 }
 
 .wizard-content {
