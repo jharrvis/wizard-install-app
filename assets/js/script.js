@@ -33,12 +33,16 @@ function openThemePreview(themeName) {
     const modalTitle = document.getElementById('modalThemeTitle');
     const desktopPreview = document.getElementById('desktopPreview');
     const mobilePreview = document.getElementById('mobilePreview');
+    const stylingTabBtn = document.querySelector('.theme-tab-btn[onclick*="styling"]');
     
     const themeData = themePreviewData[themeName];
     if (themeData) {
         modalTitle.textContent = themeData.name + ' Preview';
         desktopPreview.src = themeData.desktop;
         mobilePreview.src = themeData.mobile;
+        
+        // Show the styling tab button now that a theme is selected
+        stylingTabBtn.style.display = 'block';
         
         modal.classList.add('show');
         document.body.style.overflow = 'hidden';
@@ -48,8 +52,21 @@ function openThemePreview(themeName) {
 // Close theme preview modal
 function closeThemePreview() {
     const modal = document.getElementById('themePreviewModal');
+    const stylingTabBtn = document.querySelector('.theme-tab-btn[onclick*="styling"]');
+    const previewTab = document.getElementById('previewTab');
+    const stylingTab = document.getElementById('stylingTab');
+    
     modal.classList.remove('show');
     document.body.style.overflow = 'auto';
+    
+    // Reset to preview tab and hide styling tab
+    document.querySelectorAll('.theme-tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector('.theme-tab-btn[onclick*="preview"]').classList.add('active');
+    stylingTabBtn.style.display = 'none'; // Hide styling tab until theme is selected
+    
+    // Reset tab content
+    stylingTab.classList.remove('active');
+    previewTab.classList.add('active');
 }
 
 // Switch theme tabs
