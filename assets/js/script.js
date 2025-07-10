@@ -1,210 +1,306 @@
-// Theme preview data
-const themePreviewData = {
-  luma: {
-    name: "Luma Theme",
-    desktop:
-      "https://placehold.co/800x600/f8f9fa/6c757d?text=Luma+Desktop+Preview",
-    mobile:
-      "https://placehold.co/400x600/f8f9fa/6c757d?text=Luma+Mobile+Preview",
-  },
-  hyva: {
-    name: "Hyvä Theme",
-    desktop:
-      "https://placehold.co/800x600/e3f2fd/1976d2?text=Hyva+Desktop+Preview",
-    mobile:
-      "https://placehold.co/400x600/e3f2fd/1976d2?text=Hyva+Mobile+Preview",
-  },
-  default: {
-    name: "Default Theme",
-    desktop:
-      "https://via.placeholder.com/800x600/ffffff/666666?text=Default+Desktop+Preview",
-    mobile:
-      "https://via.placeholder.com/400x600/ffffff/666666?text=Default+Mobile+Preview",
-  },
-  ecommerce: {
-    name: "E-commerce Pro",
-    desktop:
-      "https://via.placeholder.com/800x600/f0f0f0/333333?text=Ecommerce+Desktop+Preview",
-    mobile:
-      "https://via.placeholder.com/400x600/f0f0f0/333333?text=Ecommerce+Mobile+Preview",
-  },
-  business: {
-    name: "Business Theme",
-    desktop:
-      "https://via.placeholder.com/800x600/e8e8e8/444444?text=Business+Desktop+Preview",
-    mobile:
-      "https://via.placeholder.com/400x600/e8e8e8/444444?text=Business+Mobile+Preview",
-  },
-};
-
-// Open theme preview modal
-function openThemePreview(themeName) {
-  const modal = document.getElementById("themePreviewModal");
-  const modalTitle = document.getElementById("modalThemeTitle");
-  const desktopPreview = document.getElementById("desktopPreview");
-  const mobilePreview = document.getElementById("mobilePreview");
-  const stylingTabBtn = document.querySelector(
-    '.theme-tab-btn[onclick*="styling"]'
-  );
-
-  const themeData = themePreviewData[themeName];
-  if (themeData) {
-    modalTitle.textContent = themeData.name + " Preview";
-    desktopPreview.src = themeData.desktop;
-    mobilePreview.src = themeData.mobile;
-
-    // Show the styling tab button now that a theme is selected
-    stylingTabBtn.style.display = "block";
-
-    modal.classList.add("show");
-    document.body.style.overflow = "hidden";
-  }
-}
-
-// Close theme preview modal
-function closeThemePreview() {
-  const modal = document.getElementById("themePreviewModal");
-  const stylingTabBtn = document.querySelector(
-    '.theme-tab-btn[onclick*="styling"]'
-  );
-  const previewTab = document.getElementById("previewTab");
-  const stylingTab = document.getElementById("stylingTab");
-
-  modal.classList.remove("show");
-  document.body.style.overflow = "auto";
-
-  // Reset to preview tab and hide styling tab
-  document
-    .querySelectorAll(".theme-tab-btn")
-    .forEach((btn) => btn.classList.remove("active"));
-  document
-    .querySelector('.theme-tab-btn[onclick*="preview"]')
-    .classList.add("active");
-  stylingTabBtn.style.display = "none"; // Hide styling tab until theme is selected
-
-  // Reset tab content
-  stylingTab.classList.remove("active");
-  previewTab.classList.add("active");
-}
-
-// Switch theme tabs
-function switchThemeTab(tabName) {
-  // Update tab buttons
-  document.querySelectorAll(".theme-tab-btn").forEach((btn) => {
-    btn.classList.remove("active");
-  });
-  event.target.classList.add("active");
-
-  // Update tab content
-  document.querySelectorAll(".theme-tab-content").forEach((content) => {
-    content.classList.remove("active");
-  });
-
-  if (tabName === "preview") {
-    document.getElementById("previewTab").classList.add("active");
-  } else if (tabName === "styling") {
-    document.getElementById("stylingTab").classList.add("active");
-  }
-}
-
-// Handle logo upload
-function handleLogoUpload(input) {
-  const file = input.files[0];
-  if (file) {
-    // Check file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      alert("File size must be less than 2MB");
-      return;
-    }
-
-    // Check file type
-    if (!file.type.match(/^image\/(png|jpg|jpeg|svg\+xml)$/)) {
-      alert("Please upload a valid image file (PNG, JPG, SVG)");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const logoPreview = document.getElementById("logoPreview");
-      const logoImage = document.getElementById("logoImage");
-
-      logoImage.src = e.target.result;
-      logoPreview.style.display = "block";
-
-      // Save logo data
-      wizardData.styling = wizardData.styling || {};
-      wizardData.styling.logo = e.target.result;
-      saveWizardData();
-    };
-    reader.readAsDataURL(file);
-  }
-}
-
-// Update color value from picker
-function updateColorValue(pickerId, valueId) {
-  const picker = document.getElementById(pickerId);
-  const value = document.getElementById(valueId);
+// Update color functions to include tertiary
+function updateColor(colorType) {
+  const picker = document.getElementById(`${colorType}ColorPicker`);
+  const value = document.getElementById(`${colorType}ColorValue`);
+  
   value.value = picker.value;
-
-  // Save to wizard data
-  saveColorSettings();
+  saveColorToWizardData(colorType, picker.value);
+  updateColorGuide();
 }
 
-// Update color picker from value
-function updateColorPicker(valueId, pickerId) {
-  const value = document.getElementById(valueId);
-  const picker = document.getElementById(pickerId);
-
-  // Validate hex color
+function updateColorFromText(colorType) {
+  const picker = document.getElementById(`${colorType}ColorPicker`);
+  const value = document.getElementById(`${colorType}ColorValue`);
+  
   if (/^#[0-9A-F]{6}$/i.test(value.value)) {
     picker.value = value.value;
-    saveColorSettings();
+    saveColorToWizardData(colorType, value.value);
+    updateColorGuide();
   }
 }
 
-// Save color settings
-function saveColorSettings() {
+function saveColorToWizardData(colorType, colorValue) {
   wizardData.styling = wizardData.styling || {};
-  wizardData.styling.colors = {
-    primary: document.getElementById("primaryColor").value,
-    secondary: document.getElementById("secondaryColor").value,
-    text: document.getElementById("textColor").value,
-    background: document.getElementById("bgColor").value,
-  };
+  wizardData.styling.colors = wizardData.styling.colors || {};
+  wizardData.styling.colors[colorType] = colorValue;
+  
   saveWizardData();
+  updateSummary();
 }
 
-// Update font preview
-function updateFontPreview() {
-  const headingFont = document.getElementById("headingFont").value;
-  const bodyFont = document.getElementById("bodyFont").value;
-
-  document.getElementById("headingPreview").style.fontFamily = headingFont;
-  document.getElementById("bodyPreview").style.fontFamily = bodyFont;
-
-  // Save font settings
-  wizardData.styling = wizardData.styling || {};
-  wizardData.styling.fonts = {
-    heading: headingFont,
-    body: bodyFont,
-  };
-  saveWizardData();
+function updateColorGuide() {
+  // Update color guide swatches
+  const primaryColor = document.getElementById('primaryColorPicker').value;
+  const secondaryColor = document.getElementById('secondaryColorPicker').value;
+  const tertiaryColor = document.getElementById('tertiaryColorPicker').value;
+  
+  if (document.querySelector('.primary-demo')) {
+    document.querySelector('.primary-demo').style.backgroundColor = primaryColor;
+  }
+  if (document.querySelector('.secondary-demo')) {
+    document.querySelector('.secondary-demo').style.backgroundColor = secondaryColor;
+  }
+  if (document.querySelector('.tertiary-demo')) {
+    document.querySelector('.tertiary-demo').style.backgroundColor = tertiaryColor;
+  }
 }
 
-// Close modal when clicking outside
-document.addEventListener("click", function (event) {
-  const modal = document.getElementById("themePreviewModal");
-  if (event.target === modal) {
-    closeThemePreview();
-  }
-});
+// Start installation with modal
+function startInstallation() {
+  $("#installationModal").addClass("show");
+  $("body").addClass("modal-open");
+  
+  const steps = [
+    { id: "downloadStep", delay: 1000 },
+    { id: "databaseStep", delay: 3000 },
+    { id: "configStep", delay: 5000 },
+    { id: "completeStep", delay: 7000 },
+  ];
 
-// Close modal with Escape key
-document.addEventListener("keydown", function (event) {
-  if (event.key === "Escape") {
-    closeThemePreview();
+  steps.forEach((step, index) => {
+    setTimeout(() => {
+      // Complete previous step
+      if (index > 0) {
+        const prevStep = $(`#${steps[index - 1].id}`);
+        prevStep.removeClass("active").addClass("completed");
+        prevStep
+          .find(".install-status i")
+          .removeClass("fa-spinner fa-spin")
+          .addClass("fa-check");
+      }
+
+      // Activate current step
+      const currentStepEl = $(`#${step.id}`);
+      currentStepEl.addClass("active");
+      currentStepEl
+        .find(".install-status i")
+        .removeClass("fa-clock")
+        .addClass("fa-spinner fa-spin");
+
+      // Complete last step and show completion
+      if (index === steps.length - 1) {
+        setTimeout(() => {
+          currentStepEl.removeClass("active").addClass("completed");
+          currentStepEl
+            .find(".install-status i")
+            .removeClass("fa-spinner fa-spin")
+            .addClass("fa-check");
+
+          // Hide installation steps and show completion
+          $(".installation-steps").hide();
+          $("#installationComplete").show();
+        }, 2000);
+      }
+    }, step.delay);
+  });
+}
+
+// View website function
+function viewWebsite() {
+  const storeName = wizardData.storeInfo?.name || "Your Website";
+  alert(`Opening ${storeName}...`);
+  // Here you would normally redirect to the actual website
+  // window.open('https://yourwebsite.com', '_blank');
+  
+  // Reset wizard for demo
+  if (confirm("Would you like to create another website?")) {
+    resetWizard();
+  } else {
+    $("#installationModal").removeClass("show");
+    $("body").removeClass("modal-open");
   }
-});
+}
+
+// Update summary function
+function updateSummary() {
+  $("#summary-store-name").text(wizardData.storeInfo?.name || "a");
+  $("#summary-version").text(wizardData.version || "2_4_7");
+  $("#summary-selected-theme").text(wizardData.theme || "Luma");
+  
+  // Sample data summary
+  const sampleDataText = wizardData.sampleData === 'with_sample' ? 
+    'Yes, using sample data' : 'No, using own data';
+  $("#summary-sample-data").text(sampleDataText);
+  
+  if (wizardData.styling) {
+    // Logo summary
+    if (wizardData.styling.logos) {
+      $("#summary-desktop-logo").text(wizardData.styling.logos.desktop ? "Desktop logo uploaded" : "No desktop logo uploaded");
+      $("#summary-mobile-logo").text(wizardData.styling.logos.mobile ? "Mobile logo uploaded" : "No mobile logo uploaded");
+    }
+    
+    // Color summary
+    if (wizardData.styling.colors) {
+      $("#summary-primary-color").text(wizardData.styling.colors.primary || "#4e54c8");
+      $("#summary-secondary-color").text(wizardData.styling.colors.secondary || "#8f94fb");
+      $("#summary-tertiary-color").text(wizardData.styling.colors.tertiary || "#19b78a");
+    }
+    
+    // Font summary
+    if (wizardData.styling.useDefaultFont) {
+      $("#summary-fonts").text('Using Default Theme Font');
+    } else {
+      $("#summary-fonts").text(wizardData.styling.fonts || 'Custom Font');
+    }
+  }
+}
+
+// Update theme grid based on selected platform
+function updateThemeGrid() {
+  if (wizardData.platform === "magento") {
+    $(".default-themes").hide();
+    $(".magento-themes").show();
+    
+    // Set default theme for Magento if none selected
+    if (!wizardData.theme) {
+      selectTheme('luma');
+    }
+  } else {
+    $(".default-themes").show();
+    $(".magento-themes").hide();
+    
+    // Set default theme for other platforms if none selected
+    if (!wizardData.theme || wizardData.theme === 'luma' || wizardData.theme === 'hyva') {
+      selectTheme('default');
+    }
+  }
+  
+  // Update visual selection
+  setTimeout(() => {
+    if (wizardData.theme) {
+      document.querySelector(`[data-theme="${wizardData.theme}"]`).classList.add('selected');
+    }
+  }, 100);
+  
+  saveWizardData();
+  updateNextButton();
+}
+
+// Populate form fields from saved data
+function populateFormFields() {
+  // Store info
+  if (wizardData.storeInfo) {
+    const storeName = wizardData.storeInfo.name || "Sample Store";
+    $("#storeName").val(storeName);
+    
+    // Ensure wizardData is updated with current value
+    wizardData.storeInfo.name = storeName;
+    saveWizardData();
+  }
+
+  // Platform selection
+  if (wizardData.platform) {
+    selectPlatform(wizardData.platform);
+    updateThemeGrid();
+  }
+
+  // Theme selection
+  if (wizardData.theme) {
+    selectTheme(wizardData.theme);
+  }
+
+  // Sample data
+  if (wizardData.sampleData) {
+    selectSampleData(wizardData.sampleData);
+  }
+
+  // Colors
+  if (wizardData.styling && wizardData.styling.colors) {
+    const colors = wizardData.styling.colors;
+    if (colors.primary) {
+      $("#primaryColorPicker").val(colors.primary);
+      $("#primaryColorValue").val(colors.primary);
+    }
+    if (colors.secondary) {
+      $("#secondaryColorPicker").val(colors.secondary);
+      $("#secondaryColorValue").val(colors.secondary);
+    }
+    if (colors.tertiary) {
+      $("#tertiaryColorPicker").val(colors.tertiary);
+      $("#tertiaryColorValue").val(colors.tertiary);
+    }
+    updateColorGuide();
+  }
+
+  // Fonts
+  if (wizardData.styling) {
+    if (wizardData.styling.useDefaultFont !== undefined) {
+      $("#useDefaultFont").prop('checked', wizardData.styling.useDefaultFont);
+      toggleFontSelection();
+    }
+    if (!wizardData.styling.useDefaultFont && wizardData.styling.fonts) {
+      $("#fontSearchInput").val(wizardData.styling.fonts);
+      updateCustomFont();
+    }
+  }
+
+  // Logos
+  if (wizardData.styling && wizardData.styling.logos) {
+    if (wizardData.styling.logos.desktop) {
+      $("#desktopLogoImage").attr('src', wizardData.styling.logos.desktop);
+      $("#desktopLogoPreview").show();
+    }
+    if (wizardData.styling.logos.mobile) {
+      $("#mobileLogoImage").attr('src', wizardData.styling.logos.mobile);
+      $("#mobileLogoPreview").show();
+    }
+  }
+
+  // Update plugin states after rendering
+  setTimeout(() => {
+    if (wizardData.plugins) {
+      Object.entries(wizardData.plugins).forEach(([pluginId, isEnabled]) => {
+        const checkbox = $(`#${pluginId}`);
+        if (checkbox.length) {
+          checkbox.prop("checked", isEnabled);
+          if (isEnabled) {
+            checkbox.closest('.plugin-item').addClass('selected');
+          }
+        }
+      });
+    }
+    
+    // Force validation update after everything is loaded
+    updateNextButton();
+  }, 100);
+}
+
+// Update navigation buttons
+function updateNavigation() {
+  $("#prevBtn").prop("disabled", currentStep === 1);
+
+  if (currentStep === 6) {
+    $("#nextBtn").html('<i class="fas fa-rocket"></i> Start Installation');
+  } else {
+    $("#nextBtn").html('Next Step <i class="fas fa-arrow-right"></i>');
+  }
+
+  updateNextButton();
+}
+
+// Emergency fallback to ensure button works
+setTimeout(() => {
+  console.log('=== EMERGENCY FALLBACK ===');
+  const nextBtn = $("#nextBtn");
+  
+  if (nextBtn.length > 0) {
+    // Force enable button for step 1
+    nextBtn.prop("disabled", false);
+    nextBtn.removeClass('disabled');
+    nextBtn.css({
+      'opacity': '1',
+      'pointer-events': 'auto',
+      'cursor': 'pointer',
+      'background': '#ff7101'
+    });
+    
+    console.log('Emergency fallback: Button force enabled');
+    console.log('Button disabled property:', nextBtn.prop('disabled'));
+    console.log('Button classes:', nextBtn.attr('class'));
+  } else {
+    console.error('Emergency fallback: Button not found');
+  }
+}, 1000);
 
 // Make functions global for onclick handlers
 window.openThemePreview = openThemePreview;
@@ -213,7 +309,45 @@ window.switchThemeTab = switchThemeTab;
 window.handleLogoUpload = handleLogoUpload;
 window.updateColorValue = updateColorValue;
 window.updateColorPicker = updateColorPicker;
-window.updateFontPreview = updateFontPreview; // Website Creation Wizard JavaScript
+window.updateFontPreview = updateFontPreview;
+window.closeSuccessMessage = closeSuccessMessage;
+window.openLicenseModal = openLicenseModal;
+window.closeLicenseModal = closeLicenseModal;
+window.saveLicenseKey = saveLicenseKey;
+window.switchStyleTab = switchStyleTab;
+window.getSelectedTheme = getSelectedTheme;
+window.updateColor = updateColor;
+window.updateColorFromText = updateColorFromText;
+window.updateFontFamily = updateFontFamily;
+window.selectTheme = selectTheme;
+window.selectSampleData = selectSampleData;
+window.toggleFontSelection = toggleFontSelection;
+window.updateCustomFont = updateCustomFont;
+window.viewWebsite = viewWebsite;// Enhanced Website Creation Wizard JavaScript - 6 Steps
+
+// Update placeholders
+const themePreviewData = {
+  luma: {
+    name: "Luma Theme",
+    desktop: "https://placehold.co/800x600/f8f9fa/6c757d?text=Luma+Desktop+Preview",
+    mobile: "https://placehold.co/400x600/f8f9fa/6c757d?text=Luma+Mobile+Preview",
+  },
+  hyva: {
+    name: "Hyvä Theme",
+    desktop: "https://placehold.co/800x600/e3f2fd/1976d2?text=Hyva+Desktop+Preview",
+    mobile: "https://placehold.co/400x600/e3f2fd/1976d2?text=Hyva+Mobile+Preview",
+  },
+  default: {
+    name: "Default Theme",
+    desktop: "https://placehold.co/800x600/ffffff/666666?text=Default+Desktop+Preview",
+    mobile: "https://placehold.co/400x600/ffffff/666666?text=Default+Mobile+Preview",
+  },
+  ecommerce: {
+    name: "E-commerce Pro",
+    desktop: "https://placehold.co/800x600/f0f0f0/333333?text=Ecommerce+Desktop+Preview",
+    mobile: "https://placehold.co/400x600/f0f0f0/333333?text=Ecommerce+Mobile+Preview",
+  },
+};
 
 // Platform data
 const platformData = {
@@ -331,31 +465,153 @@ const dependencyIcons = {
 
 // Global variables
 let currentStep = 1;
-let currentTab = "store-info";
+let currentLicensePlugin = null;
 let wizardData = {
   platform: null,
   version: null,
-  storeInfo: {},
-  platformConfig: {},
-  theme: null,
+  storeInfo: {
+    name: "Sample Store"
+  },
+  theme: "luma",
   plugins: {},
-  sampleData: "none",
+  licenseKeys: {},
+  sampleData: "with_sample",
+  styling: {
+    colors: {
+      primary: "#4e54c8",
+      secondary: "#8f94fb",
+      tertiary: "#19b78a"
+    },
+    fonts: "default",
+    useDefaultFont: true
+  }
 };
+
+// Plugin data (loaded from JSON)
+let pluginData = {};
 
 // Initialize wizard
 $(document).ready(function () {
+  console.log('DOM Ready - Initializing wizard...');
+  
+  // Set default values first
+  wizardData.storeInfo = wizardData.storeInfo || {};
+  wizardData.storeInfo.name = "Sample Store";
+  
+  loadPluginData();
   loadWizardData();
   initializeEventHandlers();
   updateDisplay();
+  
+  // Force populate store name field
+  $("#storeName").val(wizardData.storeInfo.name);
+  
+  // Multiple attempts to ensure button is enabled
+  updateNextButton();
+  
+  setTimeout(() => {
+    console.log('Second attempt to update button...');
+    updateNextButton();
+  }, 100);
+  
+  setTimeout(() => {
+    console.log('Third attempt to update button...');
+    updateNextButton();
+  }, 500);
 });
+
+// Load plugin data from JSON
+async function loadPluginData() {
+  try {
+    const response = await fetch('assets/data/plugins-data.json');
+    pluginData = await response.json();
+    renderPluginSections();
+  } catch (error) {
+    console.error('Error loading plugin data:', error);
+    // Fallback plugin data
+    pluginData = {
+      payments: {
+        title: "Payments",
+        description: "Payment processing plugins",
+        plugins: [
+          {
+            id: "ppcp",
+            name: "PayPal Complete Payments",
+            description: "Full-stack payment solution",
+            selected: true,
+            needsLicense: false
+          }
+        ]
+      }
+    };
+    renderPluginSections();
+  }
+}
+
+// Render plugin sections
+function renderPluginSections() {
+  const container = $("#pluginSections");
+  container.empty();
+
+  Object.entries(pluginData).forEach(([sectionKey, section]) => {
+    const sectionHtml = `
+      <div class="plugin-section">
+        <h3 class="plugin-section-title">${section.title}</h3>
+        <p class="plugin-section-description">${section.description}</p>
+        <div class="plugin-list">
+          ${section.plugins.map(plugin => `
+            <div class="plugin-item ${plugin.selected ? 'selected' : ''}" data-plugin="${plugin.id}">
+              <div class="plugin-info">
+                <h4 class="plugin-name">${plugin.name}</h4>
+                <p class="plugin-description">${plugin.description}</p>
+                ${plugin.needsLicense ? '<p class="plugin-license-text">Requires license key</p>' : ''}
+              </div>
+              <div class="plugin-controls">
+                <div class="plugin-toggle">
+                  <input type="checkbox" id="${plugin.id}" class="plugin-checkbox" ${plugin.selected ? 'checked' : ''}>
+                  <label for="${plugin.id}" class="toggle-switch"></label>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    container.append(sectionHtml);
+  });
+}
 
 // Load data from localStorage
 function loadWizardData() {
   const savedData = localStorage.getItem("wizardData");
+  
+  // Set default store name first
+  wizardData.storeInfo = wizardData.storeInfo || {};
+  wizardData.storeInfo.name = "Sample Store";
+  
   if (savedData) {
-    wizardData = { ...wizardData, ...JSON.parse(savedData) };
-    populateFormFields();
+    try {
+      const parsed = JSON.parse(savedData);
+      wizardData = { ...wizardData, ...parsed };
+      
+      // Ensure store name is not empty
+      if (!wizardData.storeInfo?.name || wizardData.storeInfo.name.trim() === '') {
+        wizardData.storeInfo.name = "Sample Store";
+      }
+      
+      console.log('Loaded wizard data from localStorage:', wizardData);
+    } catch (e) {
+      console.error('Error parsing saved data:', e);
+      // Reset to default if corrupted
+      wizardData.storeInfo.name = "Sample Store";
+    }
+  } else {
+    console.log('No saved data found, using defaults');
   }
+  
+  // Save the data to ensure consistency
+  saveWizardData();
+  populateFormFields();
 }
 
 // Save data to localStorage
@@ -388,7 +644,7 @@ function initializeEventHandlers() {
 
   // Navigation buttons
   $("#nextBtn").click(function () {
-    if (currentStep < 3) {
+    if (currentStep < 6) {
       nextStep();
     } else {
       startInstallation();
@@ -401,19 +657,76 @@ function initializeEventHandlers() {
     }
   });
 
-  // Tab navigation
-  $(".tab-button").click(function () {
-    const tab = $(this).data("tab");
-    switchTab(tab);
+  // Form inputs
+  $("#storeName").on("input keyup change blur", function() {
+    const storeName = $(this).val().trim();
+    console.log('Store name input changed to:', storeName);
+    
+    wizardData.storeInfo = wizardData.storeInfo || {};
+    wizardData.storeInfo.name = storeName;
+    saveWizardData();
+    updateSummary();
+    
+    // Immediate button update
+    updateNextButton();
   });
 
-  // Form inputs
-  $("input, textarea, select").on("input change", function () {
-    saveFormData();
+  // Theme selection (radio buttons)
+  $(document).on("change", 'input[name="theme-selection"]', function () {
+    const selectedTheme = $(this).val();
+    wizardData.theme = selectedTheme;
+    saveWizardData();
+    updateSummary();
+    updateNextButton();
+  });
+
+  // Plugin toggles
+  $(document).on("change", ".plugin-checkbox", function () {
+    const pluginId = $(this).attr("id");
+    const isChecked = $(this).is(":checked");
+    
+    // Check if plugin needs license and is being enabled
+    const pluginNeedsLicense = checkIfPluginNeedsLicense(pluginId);
+    
+    if (isChecked && pluginNeedsLicense && !wizardData.licenseKeys[pluginId]) {
+      // Show license modal immediately
+      const pluginName = getPluginName(pluginId);
+      openLicenseModal(pluginId, pluginName, true);
+      return;
+    }
+    
+    wizardData.plugins[pluginId] = isChecked;
+    
+    // Update plugin item visual state
+    const pluginItem = $(this).closest('.plugin-item');
+    if (isChecked) {
+      pluginItem.addClass('selected');
+    } else {
+      pluginItem.removeClass('selected');
+      // Remove license key if plugin is disabled
+      if (wizardData.licenseKeys[pluginId]) {
+        delete wizardData.licenseKeys[pluginId];
+      }
+    }
+    
+    saveWizardData();
+    updateSummary();
+  });
+
+  // Sample data selection
+  $('input[name="sample-data"]').change(function () {
+    wizardData.sampleData = $(this).val();
+    saveWizardData();
+    updateSummary();
+  });
+}input", function() {
+    wizardData.storeInfo.name = $(this).val();
+    saveWizardData();
+    updateSummary();
   });
 
   // Theme selection
-  $(".theme-card").click(function () {
+  $(document).on("click", ".theme-card", function () {
     $(".theme-card:visible").removeClass("selected");
     $(this).addClass("selected");
     wizardData.theme = $(this).data("theme");
@@ -422,10 +735,19 @@ function initializeEventHandlers() {
   });
 
   // Plugin toggles
-  $(".plugin-checkbox").change(function () {
+  $(document).on("change", ".plugin-checkbox", function () {
     const pluginId = $(this).attr("id");
     const isChecked = $(this).is(":checked");
     wizardData.plugins[pluginId] = isChecked;
+    
+    // Update plugin item visual state
+    const pluginItem = $(this).closest('.plugin-item');
+    if (isChecked) {
+      pluginItem.addClass('selected');
+    } else {
+      pluginItem.removeClass('selected');
+    }
+    
     saveWizardData();
     updateSummary();
   });
@@ -448,27 +770,140 @@ function selectPlatform(platform) {
 
   populateVersionSelect();
   $("#versionSection").addClass("show");
-  updateSelectedPlatformDisplay();
   updateThemeGrid();
   updateNextButton();
+}
+
+// Style tab functions
+function switchStyleTab(tabName) {
+  // Update tab buttons
+  document.querySelectorAll('.style-tabs .tab-button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+  // Update tab content
+  document.querySelectorAll('.style-tabs .tab-panel').forEach(panel => {
+    panel.classList.remove('active');
+  });
+  document.querySelector(`.style-tabs .tab-panel[data-tab="${tabName}"]`).classList.add('active');
+}
+
+// Get selected theme
+function getSelectedTheme() {
+  const selectedRadio = document.querySelector('input[name="theme-selection"]:checked');
+  return selectedRadio ? selectedRadio.value : 'luma';
+}
+
+// Logo upload functions
+function handleLogoUpload(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+
+  if (file.size > 2 * 1024 * 1024) {
+    alert("File size must be less than 2MB");
+    return;
+  }
+
+  if (!file.type.match(/^image\/(png|jpg|jpeg|svg\+xml)$/)) {
+    alert("Please upload a valid image file (PNG, JPG, SVG)");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const previewId = type === 'desktop' ? 'desktopLogoPreview' : 'mobileLogoPreview';
+    const imageId = type === 'desktop' ? 'desktopLogoImage' : 'mobileLogoImage';
+    
+    const preview = document.getElementById(previewId);
+    const image = document.getElementById(imageId);
+    
+    image.src = e.target.result;
+    preview.style.display = 'block';
+
+    // Save to wizard data
+    wizardData.styling = wizardData.styling || {};
+    wizardData.styling.logos = wizardData.styling.logos || {};
+    wizardData.styling.logos[type] = e.target.result;
+    
+    saveWizardData();
+    updateSummary();
+  };
+  reader.readAsDataURL(file);
+}
+
+// Color functions
+function updateColor(colorType) {
+  const picker = document.getElementById(`${colorType}ColorPicker`);
+  const value = document.getElementById(`${colorType}ColorValue`);
+  
+  value.value = picker.value;
+  saveColorToWizardData(colorType, picker.value);
+}
+
+function updateColorFromText(colorType) {
+  const picker = document.getElementById(`${colorType}ColorPicker`);
+  const value = document.getElementById(`${colorType}ColorValue`);
+  
+  if (/^#[0-9A-F]{6}$/i.test(value.value)) {
+    picker.value = value.value;
+    saveColorToWizardData(colorType, value.value);
+  }
+}
+
+function saveColorToWizardData(colorType, colorValue) {
+  wizardData.styling = wizardData.styling || {};
+  wizardData.styling.colors = wizardData.styling.colors || {};
+  wizardData.styling.colors[colorType] = colorValue;
+  
+  saveWizardData();
+  updateSummary();
+}
+
+// Font functions
+function updateFontFamily() {
+  const fontSelect = document.getElementById('fontFamilySelect');
+  const previewText = document.getElementById('fontPreviewText');
+  
+  const selectedFont = fontSelect.value;
+  
+  if (selectedFont === 'default') {
+    previewText.style.fontFamily = 'Montserrat';
+  } else {
+    previewText.style.fontFamily = selectedFont;
+  }
+  
+  wizardData.styling = wizardData.styling || {};
+  wizardData.styling.fonts = selectedFont;
+  
+  saveWizardData();
+  updateSummary();
 }
 
 // Update theme grid based on selected platform
 function updateThemeGrid() {
   if (wizardData.platform === "magento") {
-    // Show Magento specific themes
     $(".default-themes").hide();
     $(".magento-themes").show();
+    
+    // Set default theme for Magento
+    if (!wizardData.theme) {
+      wizardData.theme = 'luma';
+      $('#luma-theme').prop('checked', true);
+    }
   } else {
-    // Show default themes for WordPress and Laravel
     $(".default-themes").show();
     $(".magento-themes").hide();
+    
+    // Set default theme for other platforms
+    if (!wizardData.theme) {
+      wizardData.theme = 'default';
+      $('#default-theme').prop('checked', true);
+    }
   }
-
-  // Reset theme selection when platform changes
-  $(".theme-card").removeClass("selected");
-  wizardData.theme = null;
+  
   saveWizardData();
+  updateNextButton();
 }
 
 // Populate version dropdown
@@ -490,8 +925,7 @@ function populateVersionSelect() {
 // Show dependencies
 function showDependencies() {
   if (wizardData.platform && wizardData.version) {
-    const dependencies =
-      platformData[wizardData.platform].versions[wizardData.version];
+    const dependencies = platformData[wizardData.platform].versions[wizardData.version];
     const container = $("#dependenciesList");
     container.empty();
 
@@ -499,16 +933,16 @@ function showDependencies() {
       if (version !== "N/A") {
         const iconClass = dependencyIcons[dep] || "fas fa-cog";
         container.append(`
-                    <div class="dependency-item">
-                        <div class="dependency-icon ${dep}">
-                            <i class="${iconClass}"></i>
-                        </div>
-                        <div class="dependency-details">
-                            <div class="dependency-name">${dep.toUpperCase()}</div>
-                            <div class="dependency-version">v${version}</div>
-                        </div>
-                    </div>
-                `);
+          <div class="dependency-item">
+            <div class="dependency-icon ${dep}">
+              <i class="${iconClass}"></i>
+            </div>
+            <div class="dependency-details">
+              <div class="dependency-name">${dep.toUpperCase()}</div>
+              <div class="dependency-version">v${version}</div>
+            </div>
+          </div>
+        `);
       }
     });
 
@@ -516,57 +950,263 @@ function showDependencies() {
   }
 }
 
-// Update selected platform display
-function updateSelectedPlatformDisplay() {
-  if (wizardData.platform) {
-    const platformName =
-      wizardData.platform.charAt(0).toUpperCase() +
-      wizardData.platform.slice(1);
-    const iconClass = `fab fa-${wizardData.platform}`;
-
-    $("#selectedPlatformName").text(platformName);
-    $(".platform-icon-large i").removeClass().addClass(iconClass);
-
-    if (wizardData.version) {
-      $("#selectedPlatformVersion").text(`Version ${wizardData.version}`);
+// Helper functions for plugins
+function checkIfPluginNeedsLicense(pluginId) {
+  for (const section of Object.values(pluginData)) {
+    const plugin = section.plugins.find(p => p.id === pluginId);
+    if (plugin) {
+      return plugin.needsLicense;
     }
   }
+  return false;
 }
 
-// Switch tabs
-function switchTab(tab) {
-  currentTab = tab;
+function getPluginName(pluginId) {
+  for (const section of Object.values(pluginData)) {
+    const plugin = section.plugins.find(p => p.id === pluginId);
+    if (plugin) {
+      return plugin.name;
+    }
+  }
+  return pluginId;
+}
 
-  $(".tab-button").removeClass("active");
-  $(`.tab-button[data-tab="${tab}"]`).addClass("active");
+// Theme selection functions
+function selectTheme(themeName) {
+  wizardData.theme = themeName;
+  
+  // Update visual state
+  document.querySelectorAll('.theme-item').forEach(item => {
+    item.classList.remove('selected');
+  });
+  document.querySelector(`[data-theme="${themeName}"]`).classList.add('selected');
+  
+  saveWizardData();
+  updateSummary();
+  updateNextButton();
+}
 
-  $(".tab-panel").removeClass("active");
-  $(`.tab-panel[data-tab="${tab}"]`).addClass("active");
+// Sample data selection
+function selectSampleData(sampleType) {
+  wizardData.sampleData = sampleType;
+  
+  // Update visual state
+  document.querySelectorAll('.sample-item').forEach(item => {
+    item.classList.remove('selected');
+  });
+  document.querySelector(`[data-sample="${sampleType}"]`).classList.add('selected');
+  
+  saveWizardData();
+  updateSummary();
+}
 
-  if (tab === "summary") {
+// Font functions
+function toggleFontSelection() {
+  const useDefault = document.getElementById('useDefaultFont').checked;
+  const customSelection = document.getElementById('customFontSelection');
+  
+  if (useDefault) {
+    customSelection.style.display = 'none';
+    wizardData.styling.useDefaultFont = true;
+    wizardData.styling.fonts = 'default';
+    
+    // Reset preview to default
+    document.getElementById('fontPreviewText').style.fontFamily = 'Montserrat';
+  } else {
+    customSelection.style.display = 'block';
+    wizardData.styling.useDefaultFont = false;
+  }
+  
+  saveWizardData();
+  updateSummary();
+}
+
+function updateCustomFont() {
+  const fontInput = document.getElementById('fontSearchInput');
+  const fontName = fontInput.value.trim();
+  
+  if (fontName) {
+    wizardData.styling.fonts = fontName;
+    document.getElementById('fontPreviewText').style.fontFamily = fontName;
+    saveWizardData();
     updateSummary();
   }
 }
 
-// Save form data
-function saveFormData() {
-  // Store info
-  wizardData.storeInfo = {
-    name: $("#storeName").val(),
-    url: $("#storeUrl").val(),
-    email: $("#adminEmail").val(),
-    password: $("#adminPassword").val(),
-    description: $("#storeDescription").val(),
-  };
+// License modal functions (updated)
+function openLicenseModal(pluginId, pluginName, isRequired = false) {
+  currentLicensePlugin = pluginId;
+  $("#licenseModalTitle").text(`Enter License Key for ${pluginName}`);
+  $("#licenseKeyInput").val(wizardData.licenseKeys[pluginId] || '');
+  
+  if (isRequired) {
+    $("#licenseKeyInput").attr('required', true);
+  }
+  
+  $("#licenseModal").addClass("show");
+  $("body").addClass("modal-open");
+}
 
-  // Platform config
-  wizardData.platformConfig = {
-    dbName: $("#dbName").val(),
-    dbUser: $("#dbUser").val(),
-    dbPassword: $("#dbPassword").val(),
-    dbHost: $("#dbHost").val(),
-  };
+function closeLicenseModal() {
+  const isRequired = $("#licenseKeyInput").attr('required');
+  
+  if (isRequired && currentLicensePlugin) {
+    // If license is required and modal is closed without saving, uncheck the plugin
+    const checkbox = $(`#${currentLicensePlugin}`);
+    checkbox.prop('checked', false);
+    checkbox.closest('.plugin-item').removeClass('selected');
+    delete wizardData.plugins[currentLicensePlugin];
+    saveWizardData();
+  }
+  
+  $("#licenseModal").removeClass("show");
+  $("body").removeClass("modal-open");
+  currentLicensePlugin = null;
+  $("#licenseKeyInput").removeAttr('required');
+}
 
+function saveLicenseKey() {
+  const licenseKey = $("#licenseKeyInput").val().trim();
+  
+  if (!licenseKey) {
+    alert("Please enter a license key");
+    return;
+  }
+
+  if (currentLicensePlugin) {
+    wizardData.licenseKeys[currentLicensePlugin] = licenseKey;
+    wizardData.plugins[currentLicensePlugin] = true;
+    
+    // Update plugin visual state
+    const checkbox = $(`#${currentLicensePlugin}`);
+    checkbox.prop('checked', true);
+    checkbox.closest('.plugin-item').addClass('selected');
+    
+    saveWizardData();
+    updateSummary();
+    closeLicenseModal();
+  }
+}
+
+// Theme preview functions
+function openThemePreview(themeName) {
+  const modal = document.getElementById("themePreviewModal");
+  const modalTitle = document.getElementById("modalThemeTitle");
+  const desktopPreview = document.getElementById("desktopPreview");
+  const mobilePreview = document.getElementById("mobilePreview");
+  const stylingTabBtn = document.querySelector('.theme-tab-btn[onclick*="styling"]');
+
+  const themeData = themePreviewData[themeName];
+  if (themeData) {
+    modalTitle.textContent = themeData.name + " Preview";
+    desktopPreview.src = themeData.desktop;
+    mobilePreview.src = themeData.mobile;
+
+    stylingTabBtn.style.display = "block";
+    modal.classList.add("show");
+    $("body").addClass("modal-open");
+  }
+}
+
+function closeThemePreview() {
+  const modal = document.getElementById("themePreviewModal");
+  const stylingTabBtn = document.querySelector('.theme-tab-btn[onclick*="styling"]');
+  const previewTab = document.getElementById("previewTab");
+  const stylingTab = document.getElementById("stylingTab");
+
+  modal.classList.remove("show");
+  $("body").removeClass("modal-open");
+
+  document.querySelectorAll(".theme-tab-btn").forEach((btn) => btn.classList.remove("active"));
+  document.querySelector('.theme-tab-btn[onclick*="preview"]').classList.add("active");
+  stylingTabBtn.style.display = "none";
+
+  stylingTab.classList.remove("active");
+  previewTab.classList.add("active");
+}
+
+function switchThemeTab(tabName) {
+  document.querySelectorAll(".theme-tab-btn").forEach((btn) => {
+    btn.classList.remove("active");
+  });
+  event.target.classList.add("active");
+
+  document.querySelectorAll(".theme-tab-content").forEach((content) => {
+    content.classList.remove("active");
+  });
+
+  if (tabName === "preview") {
+    document.getElementById("previewTab").classList.add("active");
+  } else if (tabName === "styling") {
+    document.getElementById("stylingTab").classList.add("active");
+  }
+}
+
+// Styling functions
+function handleLogoUpload(input) {
+  const file = input.files[0];
+  if (file) {
+    if (file.size > 2 * 1024 * 1024) {
+      alert("File size must be less than 2MB");
+      return;
+    }
+
+    if (!file.type.match(/^image\/(png|jpg|jpeg|svg\+xml)$/)) {
+      alert("Please upload a valid image file (PNG, JPG, SVG)");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const logoPreview = document.getElementById("logoPreview");
+      const logoImage = document.getElementById("logoImage");
+
+      logoImage.src = e.target.result;
+      logoPreview.style.display = "block";
+
+      wizardData.styling = wizardData.styling || {};
+      wizardData.styling.logo = e.target.result;
+      saveWizardData();
+      updateSummary();
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function updateColorValue(pickerId, valueId) {
+  const picker = document.getElementById(pickerId);
+  const value = document.getElementById(valueId);
+  value.value = picker.value;
+  saveColorSettings();
+}
+
+function updateColorPicker(valueId, pickerId) {
+  const value = document.getElementById(valueId);
+  const picker = document.getElementById(pickerId);
+
+  if (/^#[0-9A-F]{6}$/i.test(value.value)) {
+    picker.value = value.value;
+    saveColorSettings();
+  }
+}
+
+function saveColorSettings() {
+  wizardData.styling = wizardData.styling || {};
+  wizardData.styling.colors = {
+    primary: document.getElementById("primaryColor").value,
+    secondary: document.getElementById("secondaryColor").value,
+    tertiary: document.getElementById("tertiaryColor").value,
+  };
+  saveWizardData();
+  updateSummary();
+}
+
+function updateFontPreview() {
+  const fontFamily = document.getElementById("fontFamily").value;
+  document.getElementById("fontPreview").style.fontFamily = fontFamily === 'default' ? 'Montserrat' : fontFamily;
+
+  wizardData.styling = wizardData.styling || {};
+  wizardData.styling.fonts = fontFamily;
   saveWizardData();
   updateSummary();
 }
@@ -575,19 +1215,7 @@ function saveFormData() {
 function populateFormFields() {
   // Store info
   if (wizardData.storeInfo) {
-    $("#storeName").val(wizardData.storeInfo.name || "");
-    $("#storeUrl").val(wizardData.storeInfo.url || "");
-    $("#adminEmail").val(wizardData.storeInfo.email || "");
-    $("#adminPassword").val(wizardData.storeInfo.password || "");
-    $("#storeDescription").val(wizardData.storeInfo.description || "");
-  }
-
-  // Platform config
-  if (wizardData.platformConfig) {
-    $("#dbName").val(wizardData.platformConfig.dbName || "");
-    $("#dbUser").val(wizardData.platformConfig.dbUser || "");
-    $("#dbPassword").val(wizardData.platformConfig.dbPassword || "");
-    $("#dbHost").val(wizardData.platformConfig.dbHost || "localhost");
+    $("#storeName").val(wizardData.storeInfo.name || "Sample Store");
   }
 
   // Platform selection
@@ -596,82 +1224,88 @@ function populateFormFields() {
     updateThemeGrid();
   }
 
-  // Theme selection - check if selected theme is visible
+  // Theme selection
   if (wizardData.theme) {
-    const selectedThemeCard = $(
-      `.theme-card[data-theme="${wizardData.theme}"]`
-    );
-    if (selectedThemeCard.is(":visible")) {
-      selectedThemeCard.addClass("selected");
-    } else {
-      // Reset theme if not compatible with current platform
-      wizardData.theme = null;
-      saveWizardData();
-    }
-  }
-
-  // Plugin settings
-  if (wizardData.plugins) {
-    Object.entries(wizardData.plugins).forEach(([pluginId, isEnabled]) => {
-      $(`#${pluginId}`).prop("checked", isEnabled);
-    });
+    $(`input[name="theme-selection"][value="${wizardData.theme}"]`).prop('checked', true);
   }
 
   // Sample data
   if (wizardData.sampleData) {
-    $(`input[name="sample-data"][value="${wizardData.sampleData}"]`).prop(
-      "checked",
-      true
-    );
+    $(`input[name="sample-data"][value="${wizardData.sampleData}"]`).prop("checked", true);
   }
+
+  // Colors
+  if (wizardData.styling && wizardData.styling.colors) {
+    const colors = wizardData.styling.colors;
+    if (colors.primary) {
+      $("#primaryColorPicker").val(colors.primary);
+      $("#primaryColorValue").val(colors.primary);
+    }
+    if (colors.secondary) {
+      $("#secondaryColorPicker").val(colors.secondary);
+      $("#secondaryColorValue").val(colors.secondary);
+    }
+  }
+
+  // Fonts
+  if (wizardData.styling && wizardData.styling.fonts) {
+    $("#fontFamilySelect").val(wizardData.styling.fonts);
+    updateFontFamily();
+  }
+
+  // Logos
+  if (wizardData.styling && wizardData.styling.logos) {
+    if (wizardData.styling.logos.desktop) {
+      $("#desktopLogoImage").attr('src', wizardData.styling.logos.desktop);
+      $("#desktopLogoPreview").show();
+    }
+    if (wizardData.styling.logos.mobile) {
+      $("#mobileLogoImage").attr('src', wizardData.styling.logos.mobile);
+      $("#mobileLogoPreview").show();
+    }
+  }
+
+  // Update plugin states after rendering
+  setTimeout(() => {
+    if (wizardData.plugins) {
+      Object.entries(wizardData.plugins).forEach(([pluginId, isEnabled]) => {
+        const checkbox = $(`#${pluginId}`);
+        if (checkbox.length) {
+          checkbox.prop("checked", isEnabled);
+          if (isEnabled) {
+            checkbox.closest('.plugin-item').addClass('selected');
+          }
+        }
+      });
+    }
+  }, 100);
 }
 
 // Update summary
 function updateSummary() {
-  // Platform summary
-  if (wizardData.platform && wizardData.version) {
-    const platformName =
-      wizardData.platform.charAt(0).toUpperCase() +
-      wizardData.platform.slice(1);
-    $("#summary-platform").html(`
-            <p><strong>Platform:</strong> ${platformName}</p>
-            <p><strong>Version:</strong> ${wizardData.version}</p>
-        `);
+  $("#summary-store-name").text(wizardData.storeInfo?.name || "a");
+  $("#summary-version").text(wizardData.version || "2_4_7");
+  $("#summary-selected-theme").text(wizardData.theme || "Luma");
+  
+  if (wizardData.styling) {
+    // Logo summary
+    if (wizardData.styling.logos) {
+      $("#summary-desktop-logo").text(wizardData.styling.logos.desktop ? "Desktop logo uploaded" : "No desktop logo uploaded");
+      $("#summary-mobile-logo").text(wizardData.styling.logos.mobile ? "Mobile logo uploaded" : "No mobile logo uploaded");
+    }
+    
+    // Color summary
+    if (wizardData.styling.colors) {
+      $("#summary-primary-color").text(wizardData.styling.colors.primary || "#4e54c8");
+      $("#summary-secondary-color").text(wizardData.styling.colors.secondary || "#8f94fb");
+      $("#summary-tertiary-color").text(wizardData.styling.colors.tertiary || "#19b78a");
+    }
+    
+    // Font summary
+    if (wizardData.styling.fonts) {
+      $("#summary-fonts").text(wizardData.styling.fonts === 'default' ? 'Using Default Theme Font' : wizardData.styling.fonts);
+    }
   }
-
-  // Store info summary
-  if (wizardData.storeInfo && wizardData.storeInfo.name) {
-    $("#summary-store").html(`
-            <p><strong>Store Name:</strong> ${wizardData.storeInfo.name}</p>
-            <p><strong>URL:</strong> ${wizardData.storeInfo.url}</p>
-            <p><strong>Admin Email:</strong> ${wizardData.storeInfo.email}</p>
-        `);
-  }
-
-  // Theme summary
-  if (wizardData.theme) {
-    const themeNames = {
-      default: "Default Theme",
-      ecommerce: "E-commerce Pro",
-      business: "Business",
-      luma: "Luma (Magento Default)",
-      hyva: "Hyvä (Premium)",
-    };
-    const themeName = themeNames[wizardData.theme] || wizardData.theme;
-    $("#summary-theme").html(
-      `<p><strong>Selected Theme:</strong> ${themeName}</p>`
-    );
-  }
-
-  // Plugin summary
-  const enabledPlugins = Object.entries(wizardData.plugins || {})
-    .filter(([key, value]) => value)
-    .map(([key, value]) => key.replace("-plugin", "").replace("-", " "))
-    .join(", ");
-
-  $("#summary-plugins").html(
-    `<p><strong>Enabled Plugins:</strong> ${enabledPlugins || "None"}</p>`
-  );
 }
 
 // Navigation functions
@@ -681,10 +1315,6 @@ function nextStep() {
     updateStepDisplay();
     updateProgressBar();
     updateNavigation();
-
-    if (currentStep === 2) {
-      switchTab("store-info");
-    }
   }
 }
 
@@ -697,16 +1327,35 @@ function prevStep() {
 
 // Validate current step
 function validateCurrentStep() {
-  if (currentStep === 1) {
-    return wizardData.platform && wizardData.version;
-  } else if (currentStep === 2) {
-    return (
-      wizardData.storeInfo &&
-      wizardData.storeInfo.name &&
-      wizardData.storeInfo.email
-    );
+  let result = false;
+  
+  switch (currentStep) {
+    case 1:
+      // Step 1 should be valid if store name exists and not empty
+      const storeName = wizardData.storeInfo?.name;
+      result = storeName && storeName.trim().length > 0;
+      console.log('Step 1 validation - Store name:', storeName, 'Result:', result);
+      break;
+    case 2:
+      result = wizardData.platform && wizardData.version;
+      console.log('Step 2 validation - Platform:', wizardData.platform, 'Version:', wizardData.version, 'Result:', result);
+      break;
+    case 3:
+      result = wizardData.theme && wizardData.theme !== '';
+      console.log('Step 3 validation - Theme:', wizardData.theme, 'Result:', result);
+      break;
+    case 4:
+    case 5:
+    case 6:
+      result = true; // Plugin, sample data, and summary steps are always valid
+      break;
+    default:
+      result = true;
+      break;
   }
-  return true;
+  
+  console.log(`Final validation result for step ${currentStep}:`, result);
+  return result;
 }
 
 // Update step display
@@ -724,27 +1373,30 @@ function updateStepDisplay() {
 
 // Update progress bar
 function updateProgressBar() {
-  const progress = (currentStep / 3) * 100;
+  const progress = (currentStep / 6) * 100;
   $(".progress-fill").css("width", progress + "%");
 
   const stepTexts = {
-    1: "Step 1 of 3 - Platform Selection",
-    2: "Step 2 of 3 - Website Configuration",
-    3: "Step 3 of 3 - Installation",
+    1: "Step 1 of 6 - Store Info",
+    2: "Step 2 of 6 - Platform",
+    3: "Step 3 of 6 - Styles",
+    4: "Step 4 of 6 - Plugin Settings",
+    5: "Step 5 of 6 - Sample Data",
+    6: "Step 6 of 6 - Summary",
   };
 
   $(".progress-text").text(stepTexts[currentStep]);
-  $(".nav-info .current-step").text(`Step ${currentStep} of 3`);
+  $(".nav-info .current-step").text(`Step ${currentStep} of 6`);
 }
 
 // Update navigation buttons
 function updateNavigation() {
   $("#prevBtn").prop("disabled", currentStep === 1);
 
-  if (currentStep === 3) {
-    $("#nextBtn").html('<i class="fas fa-rocket"></i>  Start Installation');
+  if (currentStep === 6) {
+    $("#nextBtn").html('<i class="fas fa-rocket"></i> Start Installation');
   } else {
-    $("#nextBtn").html('Next <i class="fas fa-arrow-right"></i>');
+    $("#nextBtn").html('Next Step <i class="fas fa-arrow-right"></i>');
   }
 
   updateNextButton();
@@ -753,7 +1405,45 @@ function updateNavigation() {
 // Update next button state
 function updateNextButton() {
   const isValid = validateCurrentStep();
-  $("#nextBtn").prop("disabled", !isValid);
+  const nextBtn = $("#nextBtn");
+  
+  console.log('=== updateNextButton Debug ===');
+  console.log('Current Step:', currentStep);
+  console.log('Store Name:', wizardData.storeInfo?.name);
+  console.log('Is Valid:', isValid);
+  console.log('Button element found:', nextBtn.length > 0);
+  
+  if (nextBtn.length === 0) {
+    console.error('Next button not found!');
+    return;
+  }
+  
+  // Remove disabled attribute and class
+  nextBtn.prop("disabled", false);
+  nextBtn.removeClass('disabled');
+  
+  if (isValid) {
+    nextBtn.css({
+      'opacity': '1',
+      'pointer-events': 'auto',
+      'cursor': 'pointer',
+      'background': '#ff7101'
+    });
+    console.log('Button enabled');
+  } else {
+    nextBtn.prop("disabled", true);
+    nextBtn.addClass('disabled');
+    nextBtn.css({
+      'opacity': '0.5',
+      'pointer-events': 'none',
+      'cursor': 'not-allowed',
+      'background': '#cccccc'
+    });
+    console.log('Button disabled');
+  }
+  
+  console.log('Button final state - disabled:', nextBtn.prop('disabled'));
+  console.log('=== End Debug ===');
 }
 
 // Update display
@@ -761,13 +1451,11 @@ function updateDisplay() {
   updateStepDisplay();
   updateProgressBar();
   updateNavigation();
-  updateSelectedPlatformDisplay();
   updateSummary();
 }
 
 // Start installation
 function startInstallation() {
-  // Simulate installation process
   const steps = [
     { selector: ".install-step:nth-child(1)", delay: 1000 },
     { selector: ".install-step:nth-child(2)", delay: 3000 },
@@ -781,7 +1469,6 @@ function startInstallation() {
 
   steps.forEach((step, index) => {
     setTimeout(() => {
-      // Complete previous step
       if (index > 0) {
         const prevStep = $(steps[index - 1].selector);
         prevStep.removeClass("active").addClass("completed");
@@ -791,7 +1478,6 @@ function startInstallation() {
           .addClass("fa-check");
       }
 
-      // Activate current step
       const currentStepEl = $(step.selector);
       currentStepEl.addClass("active");
       currentStepEl
@@ -799,7 +1485,6 @@ function startInstallation() {
         .removeClass("fa-clock")
         .addClass("fa-spinner fa-spin");
 
-      // Complete last step
       if (index === steps.length - 1) {
         setTimeout(() => {
           currentStepEl.removeClass("active").addClass("completed");
@@ -812,7 +1497,6 @@ function startInstallation() {
             .prop("disabled", false)
             .html('<i class="fas fa-external-link-alt"></i> Open Website');
 
-          // Show success message
           showSuccessMessage();
         }, 2000);
       }
@@ -823,45 +1507,45 @@ function startInstallation() {
 // Show success message
 function showSuccessMessage() {
   const storeName = wizardData.storeInfo?.name || "Your Website";
-  const storeUrl = wizardData.storeInfo?.url || "yourwebsite.com";
+  const storeUrl = "yourwebsite.com";
 
   const successHtml = `
-        <div class="success-message" style="
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #fff;
-            padding: 4rem;
-            border-radius: 2rem;
-            box-shadow: 0 2rem 4rem rgba(0,0,0,.3);
-            z-index: 1000;
-            text-align: center;
-            max-width: 50rem;
-        ">
-            <i class="fas fa-check-circle" style="font-size: 6rem; color: #32be7d; margin-bottom: 2rem;"></i>
-            <h2 class="h3-headline" style="color: #0f488a; margin-bottom: 2rem;">Installation Complete!</h2>
-            <p class="p-text" style="margin-bottom: 3rem;">
-                ${storeName} has been successfully installed and is ready to use.
-            </p>
-            <div style="margin-bottom: 3rem;">
-                <p><strong>Website URL:</strong> https://${storeUrl}</p>
-                <p><strong>Admin Panel:</strong> https://${storeUrl}/admin</p>
-            </div>
-            <button onclick="closeSuccessMessage()" class="button" style="margin-top: 0;">
-                <i class="fas fa-times"></i> Close
-            </button>
+    <div class="success-message" style="
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 4rem;
+        border-radius: 2rem;
+        box-shadow: 0 2rem 4rem rgba(0,0,0,.3);
+        z-index: 1000;
+        text-align: center;
+        max-width: 50rem;
+    ">
+        <i class="fas fa-check-circle" style="font-size: 6rem; color: #32be7d; margin-bottom: 2rem;"></i>
+        <h2 class="h3-headline" style="color: #0f488a; margin-bottom: 2rem;">Installation Complete!</h2>
+        <p class="p-text" style="margin-bottom: 3rem;">
+            ${storeName} has been successfully installed and is ready to use.
+        </p>
+        <div style="margin-bottom: 3rem;">
+            <p><strong>Website URL:</strong> https://${storeUrl}</p>
+            <p><strong>Admin Panel:</strong> https://${storeUrl}/admin</p>
         </div>
-        <div class="overlay" style="
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        " onclick="closeSuccessMessage()"></div>
-    `;
+        <button onclick="closeSuccessMessage()" class="button" style="margin-top: 0;">
+            <i class="fas fa-times"></i> Close
+        </button>
+    </div>
+    <div class="overlay" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+    " onclick="closeSuccessMessage()"></div>
+  `;
 
   $("body").append(successHtml);
 }
@@ -870,7 +1554,6 @@ function showSuccessMessage() {
 function closeSuccessMessage() {
   $(".success-message, .overlay").remove();
 
-  // Reset wizard for new installation
   if (confirm("Would you like to create another website?")) {
     resetWizard();
   }
@@ -893,8 +1576,7 @@ function validatePassword(password) {
 }
 
 function validateUrl(url) {
-  const re =
-    /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  const re = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
   return re.test(url);
 }
 
@@ -943,9 +1625,7 @@ function showFieldError(field, message) {
   let $error = $field.next(".field-error");
 
   if ($error.length === 0) {
-    $error = $(
-      '<div class="field-error" style="color: #ff7101; font-size: 1.4rem; margin-top: 0.5rem;"></div>'
-    );
+    $error = $('<div class="field-error" style="color: #ff7101; font-size: 1.4rem; margin-top: 0.5rem;"></div>');
     $field.after($error);
   }
 
@@ -960,17 +1640,50 @@ function hideFieldError(field) {
 // Add error styles
 $("<style>")
   .prop("type", "text/css")
-  .html(
-    `
+  .html(`
     .form-input.error,
     .form-textarea.error,
     .form-select.error {
         border-color: #ff7101 !important;
         box-shadow: 0 0 0 .3rem rgba(255, 113, 1, .2) !important;
     }
-`
-  )
+`)
   .appendTo("head");
 
-// Global function for success message (needed for onclick)
+// Close modal when clicking outside
+document.addEventListener("click", function (event) {
+  const themeModal = document.getElementById("themePreviewModal");
+  const licenseModal = document.getElementById("licenseModal");
+  
+  if (event.target === themeModal) {
+    closeThemePreview();
+  }
+  
+  // Don't close license modal on clicking overlay - let the onclick handler do it
+});
+
+// Close modal with Escape key
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") {
+    closeThemePreview();
+    closeLicenseModal();
+  }
+});
+
+// Make functions global for onclick handlers
+window.openThemePreview = openThemePreview;
+window.closeThemePreview = closeThemePreview;
+window.switchThemeTab = switchThemeTab;
+window.handleLogoUpload = handleLogoUpload;
+window.updateColorValue = updateColorValue;
+window.updateColorPicker = updateColorPicker;
+window.updateFontPreview = updateFontPreview;
 window.closeSuccessMessage = closeSuccessMessage;
+window.openLicenseModal = openLicenseModal;
+window.closeLicenseModal = closeLicenseModal;
+window.saveLicenseKey = saveLicenseKey;
+window.switchStyleTab = switchStyleTab;
+window.getSelectedTheme = getSelectedTheme;
+window.updateColor = updateColor;
+window.updateColorFromText = updateColorFromText;
+window.updateFontFamily = updateFontFamily;
