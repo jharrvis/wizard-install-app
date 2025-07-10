@@ -2280,3 +2280,196 @@ input[type="radio"] {
     right: -5rem;
   }
 }
+
+/* CSS Fixes for Website Creation Wizard - Step Content Visibility */
+
+/* Force step content to be visible when active */
+.step-content {
+  display: none !important;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.step-content.active {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* Ensure wizard main has proper height */
+.wizard-main {
+  min-height: 60vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix any potential z-index issues */
+.wizard-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure platform cards are properly sized and visible */
+.platform-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(35rem, 1fr));
+  gap: 3rem;
+  margin: 5rem 0;
+  opacity: 1;
+  visibility: visible;
+}
+
+.platform-card {
+  display: flex !important;
+  flex-direction: column;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix version section visibility */
+.version-section {
+  display: none;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.version-section.show {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* Fix dependencies display */
+.dependencies {
+  display: none;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.dependencies.show {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* Fix theme selection visibility */
+.theme-selection {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.theme-item {
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure forms are visible */
+.form {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.form__fieldset {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Fix step header visibility */
+.step-header {
+  opacity: 1 !important;
+  visibility: visible !important;
+  margin-bottom: 3rem;
+}
+
+/* Ensure buttons are visible and clickable */
+.wizard-navigation {
+  position: relative;
+  z-index: 10;
+  background: #fff;
+}
+
+.btn {
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix any overflow issues */
+.wizard-container {
+  overflow: visible;
+}
+
+/* Ensure proper display for all step content types */
+.step-content h1,
+.step-content h2,
+.step-content h3,
+.step-content h4,
+.step-content p {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Fix plugin sections */
+#pluginSections {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.plugin-section {
+  opacity: 1 !important;
+  visibility: visible !important;
+  margin-bottom: 4rem;
+}
+
+/* Fix sample data selection */
+.sample-data-selection {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.sample-item {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Fix summary display */
+.summary-display {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Debug helper - add red border to active step for testing */
+.step-content.active.debug-mode {
+  border: 3px solid red !important;
+  background: rgba(255, 0, 0, 0.1) !important;
+}
+
+/* Force visibility override for debugging */
+.force-visible {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  z-index: 999 !important;
+}
+
+/* Responsive fixes */
+@media screen and (max-width: 768px) {
+  .step-content.active {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .platform-grid {
+    grid-template-columns: 1fr;
+  }
+}
