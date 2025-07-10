@@ -1,0 +1,10 @@
+{
+  "build": {
+    "env": {
+      "PUBLIC_URL": "@public-url"
+    }
+  },
+  "env": {
+    "PUBLIC_URL": "@public-url"
+  }
+}
