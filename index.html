@@ -1,992 +1,738 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Website Creation Wizard - Corefinity</title>
-
+    
     <!-- Local Main CSS -->
-    <link rel="stylesheet" href="assets/css/main.css" />
-
+    <link rel="stylesheet" href="assets/css/main.css">
+    
     <!-- Font Awesome -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/css/styles.css" />
-  </head>
-  <body>
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
     <!-- Header -->
     <header class="header-wizard">
-      <div class="header-wizard__container">
-        <a href="#" class="header-wizard__logo">
-          <img src="assets/img/logo.svg" alt="Corefinity" class="logo-image" />
-        </a>
-
-        <!-- User Profile Section -->
-        <div class="user-profile">
-          <div class="user-info">
-            <span class="user-name">John Doe</span>
-            <span class="user-role">Administrator</span>
-          </div>
-          <div class="user-avatar">
-            <img
-              src="https://placehold.co/40x40/009bde/ffffff?text=JD"
-              alt="User Avatar"
-              class="avatar-image"
-            />
-            <div class="user-dropdown">
-              <div class="dropdown-arrow"></div>
-              <div class="dropdown-menu">
-                <a href="#" class="dropdown-item">
-                  <i class="fas fa-user"></i>
-                  Profile
-                </a>
-                <a href="#" class="dropdown-item">
-                  <i class="fas fa-globe"></i>
-                  My Sites
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                  <i class="fas fa-sign-out-alt"></i>
-                  Logout
-                </a>
-              </div>
+        <div class="header-wizard__container">
+            <a href="#" class="header-wizard__logo">
+                <img src="assets/img/logo.svg" alt="Corefinity" class="logo-image">
+            </a>
+            
+            <!-- User Profile Section -->
+            <div class="user-profile">
+                <div class="user-info">
+                    <span class="user-name">John Doe</span>
+                    <span class="user-role">Administrator</span>
+                </div>
+                <div class="user-avatar">
+                    <img src="https://placehold.co/40x40/009bde/ffffff?text=JD" alt="User Avatar" class="avatar-image">
+                    <div class="user-dropdown">
+                        <div class="dropdown-arrow"></div>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-user"></i>
+                                Profile Settings
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-cog"></i>
+                                Account Settings
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-bell"></i>
+                                Notifications
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </header>
 
     <!-- Main Content -->
     <div class="wizard-container">
-      <!-- Sidebar -->
-      <div class="wizard-sidebar">
-        <div class="wizard-steps">
-          <h3 class="h5-headline color-second">Installation Steps</h3>
-          <ul class="step-list">
-            <li class="step-item active" data-step="1">
-              <div class="step-number">1</div>
-              <div class="step-content-wrapper">
-                <div class="step-title">Store Info</div>
-                <div class="step-description">Basic store information</div>
-              </div>
-            </li>
-            <li class="step-item" data-step="2">
-              <div class="step-number">2</div>
-              <div class="step-content-wrapper">
-                <div class="step-title">Platform</div>
-                <div class="step-description">Choose your platform</div>
-              </div>
-            </li>
-            <li class="step-item" data-step="3">
-              <div class="step-number">3</div>
-              <div class="step-content-wrapper">
-                <div class="step-title">Styles</div>
-                <div class="step-description">Design and themes</div>
-              </div>
-            </li>
-            <li class="step-item" data-step="4">
-              <div class="step-number">4</div>
-              <div class="step-content-wrapper">
-                <div class="step-title">Plugin Settings</div>
-                <div class="step-description">Enable plugins</div>
-              </div>
-            </li>
-            <li class="step-item" data-step="5">
-              <div class="step-number">5</div>
-              <div class="step-content-wrapper">
-                <div class="step-title">Sample Data</div>
-                <div class="step-description">Install sample data</div>
-              </div>
-            </li>
-            <li class="step-item" data-step="6">
-              <div class="step-number">6</div>
-              <div class="step-content-wrapper">
-                <div class="step-title">Summary</div>
-                <div class="step-description">Review and install</div>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Main Content Area -->
-      <div class="wizard-content">
-        <!-- Progress Bar -->
-        <div class="progress-container">
-          <div class="progress-wrapper">
-            <div class="progress-bar">
-              <div class="progress-fill"></div>
-            </div>
-            <div class="progress-text">Step 1 of 6 - Store Info</div>
-          </div>
-        </div>
-
-        <!-- Content Steps -->
-        <div class="wizard-main">
-          <!-- Step 1: Store Info -->
-          <div class="step-content active" data-step="1">
-            <div class="step-header">
-              <h1 class="h3-headline">
-                Let's Build Your Fresh Magento Website
-              </h1>
-              <p class="p-text">
-                Corefinity Magento Wizard is a no-code solution for building and
-                deploying a fully functional Magento store. Simply input some
-                basic information throughout the guided steps to configure your
-                store. Including our approved third-parties ensuring your site
-                is tailored to you and your Magento Store
-              </p>
-            </div>
-
-            <div class="form">
-              <div class="form__fieldset">
-                <h4 class="form__fieldset_h4">Store Name</h4>
-                <div class="form__fieldset_box">
-                  <input
-                    type="text"
-                    class="form__fieldset_input"
-                    id="storeName"
-                    placeholder="Sample Store"
-                    value="Sample Store"
-                  />
-                </div>
-                <p class="p-text">12 / 14</p>
-                <p class="p-text color-second">Store name Available</p>
-              </div>
-
-              <div class="form__info">
-                <div class="licensing-notice">
-                  <div class="notice-icon">
-                    <i class="fas fa-info-circle"></i>
-                  </div>
-                  <div class="notice-content">
-                    <h4 class="h4-headline">Licensing</h4>
-                    <p class="p-text">
-                      Depending on your modules and theme, you may need to add
-                      your license keys to demo and/or download your
-                      development-ready package.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Step 2: Platform Selection -->
-          <div class="step-content" data-step="2">
-            <div class="step-header">
-              <h1 class="h3-headline">Environment Setup</h1>
-              <p class="p-text">Select your Platform</p>
-            </div>
-
-            <div class="platform-grid">
-              <div
-                class="platform-card item item-border-right"
-                data-platform="magento"
-              >
-                <div class="item-border">
-                  <div class="item-border__part item-border__part01"></div>
-                  <div class="item-border__part item-border__part02"></div>
-                  <div class="item-border__part item-border__part03"></div>
-                </div>
-                <div class="platform-icon">
-                  <i class="fab fa-magento"></i>
-                </div>
-                <h3 class="h4-headline">Magento</h3>
-                <p class="platform-description">
-                  Powerful e-commerce platform for online stores with advanced
-                  features and scalability
-                </p>
-              </div>
-
-              <div
-                class="platform-card item item-border-left"
-                data-platform="laravel"
-              >
-                <div class="item-border">
-                  <div class="item-border__part item-border__part01"></div>
-                  <div class="item-border__part item-border__part02"></div>
-                  <div class="item-border__part item-border__part03"></div>
-                </div>
-                <div class="platform-icon">
-                  <i class="fab fa-laravel"></i>
-                </div>
-                <h3 class="h4-headline">Laravel</h3>
-                <p class="platform-description">
-                  Modern PHP framework for custom web applications with elegant
-                  syntax and features
-                </p>
-              </div>
-
-              <div
-                class="platform-card item item-border-bottom"
-                data-platform="wordpress"
-              >
-                <div class="item-border">
-                  <div class="item-border__part item-border__part01"></div>
-                  <div class="item-border__part item-border__part02"></div>
-                  <div class="item-border__part item-border__part03"></div>
-                </div>
-                <div class="platform-icon">
-                  <i class="fab fa-wordpress"></i>
-                </div>
-                <h3 class="h4-headline">WordPress</h3>
-                <p class="platform-description">
-                  Popular CMS perfect for blogs, business websites, and
-                  portfolios with extensive themes
-                </p>
-              </div>
-            </div>
-
-            <!-- Version Selection -->
-            <div class="version-section" id="versionSection">
-              <div class="section-header">
-                <h3 class="h4-headline">Platform Configuration</h3>
-                <p class="p-text">
-                  Select the version and review the required dependencies for
-                  your chosen platform.
-                </p>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label" for="versionSelect"
-                    >Platform Version</label
-                  >
-                  <select class="form-select" id="versionSelect">
-                    <option value="">Choose version...</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="dependencies" id="dependenciesDisplay">
-                <h4 class="h5-headline">Required Dependencies</h4>
-                <div class="dependencies-grid" id="dependenciesList"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Step 3: Styles -->
-          <div class="step-content" data-step="3">
-            <div class="step-header">
-              <h1 class="h3-headline">Choose Your Frontend Framework</h1>
-              <p class="p-text">Select Your Theme</p>
-            </div>
-
-            <!-- Style Tabs -->
-            <div class="style-tabs">
-              <div class="tab-navigation">
-                <button
-                  class="tab-button active"
-                  data-tab="theme"
-                  onclick="switchStyleTab('theme')"
-                >
-                  <i class="fas fa-palette"></i>
-                  Theme
-                </button>
-                <button
-                  class="tab-button"
-                  data-tab="logo"
-                  onclick="switchStyleTab('logo')"
-                >
-                  <i class="fas fa-image"></i>
-                  Logo
-                </button>
-                <button
-                  class="tab-button"
-                  data-tab="colors"
-                  onclick="switchStyleTab('colors')"
-                >
-                  <i class="fas fa-paint-brush"></i>
-                  Colors
-                </button>
-                <button
-                  class="tab-button"
-                  data-tab="font"
-                  onclick="switchStyleTab('font')"
-                >
-                  <i class="fas fa-font"></i>
-                  Font
-                </button>
-              </div>
-
-              <!-- Theme Tab -->
-              <div class="tab-panel active" data-tab="theme">
-                <div class="theme-selection">
-                  <!-- Magento specific themes -->
-                  <div
-                    class="theme-item magento-themes theme-clickable"
-                    data-theme="luma"
-                    onclick="selectTheme('luma')"
-                  >
-                    <div class="theme-card">
-                      <div class="theme-icon">
-                        <span class="theme-badge">LUMA</span>
-                      </div>
-                      <div class="theme-info">
-                        <h4 class="theme-name">Luma</h4>
-                        <p class="theme-description">
-                          Magento's default frontend theme, offering a
-                          traditional setup with built-in compatibility for most
-                          extensions. It's a familiar choice but can be slower
-                          and more resource-intensive.
-                        </p>
-                      </div>
-                      <div class="theme-actions">
-                        <div class="theme-radio-visual" id="luma-radio"></div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div
-                    class="theme-item magento-themes theme-clickable"
-                    data-theme="hyva"
-                    onclick="selectTheme('hyva')"
-                  >
-                    <div class="theme-card">
-                      <div class="theme-icon">
-                        <span class="theme-badge">HYVA</span>
-                      </div>
-                      <div class="theme-info">
-                        <h4 class="theme-name">
-                          Hyva Theme
-                          <span class="license-required"
-                            >License Key Needed</span
-                          >
-                        </h4>
-                        <p class="theme-description">
-                          A modern, lightweight alternative designed for speed
-                          and performance. Hyva significantly improves site load
-                          times and user experience while reducing complexity.
-                        </p>
-                      </div>
-                      <div class="theme-actions">
-                        <div class="theme-radio-visual" id="hyva-radio"></div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Default themes for other platforms -->
-                  <div
-                    class="theme-item default-themes theme-clickable"
-                    data-theme="default"
-                    style="display: none"
-                    onclick="selectTheme('default')"
-                  >
-                    <div class="theme-card">
-                      <div class="theme-icon">
-                        <i class="fas fa-image"></i>
-                      </div>
-                      <div class="theme-info">
-                        <h4 class="theme-name">Default Theme</h4>
-                        <p class="theme-description">
-                          Clean and modern default theme perfect for any
-                          business
-                        </p>
-                      </div>
-                      <div class="theme-actions">
-                        <div
-                          class="theme-radio-visual"
-                          id="default-radio"
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="theme-preview-section">
-                  <button
-                    class="btn btn-secondary"
-                    onclick="openThemePreview(getSelectedTheme())"
-                  >
-                    <i class="fas fa-eye"></i>
-                    Preview Theme
-                  </button>
-                </div>
-              </div>
-
-              <!-- Logo Tab -->
-              <div class="tab-panel" data-tab="logo">
-                <div class="logo-uploads">
-                  <div class="logo-section">
-                    <h4 class="h4-headline">Desktop Logo</h4>
-                    <div
-                      class="logo-upload-area"
-                      onclick="document.getElementById('desktopLogoFile').click()"
-                    >
-                      <input
-                        type="file"
-                        id="desktopLogoFile"
-                        accept="image/*"
-                        onchange="handleLogoUpload(this, 'desktop')"
-                      />
-                      <div class="upload-content">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <p>Click to upload desktop logo</p>
-                        <small>PNG, JPG, SVG (Max 2MB)</small>
-                      </div>
-                    </div>
-                    <div
-                      class="logo-preview"
-                      id="desktopLogoPreview"
-                      style="display: none"
-                    >
-                      <img id="desktopLogoImage" src="" alt="Desktop Logo" />
-                    </div>
-                  </div>
-
-                  <div class="logo-section">
-                    <h4 class="h4-headline">Mobile Logo</h4>
-                    <div
-                      class="logo-upload-area"
-                      onclick="document.getElementById('mobileLogoFile').click()"
-                    >
-                      <input
-                        type="file"
-                        id="mobileLogoFile"
-                        accept="image/*"
-                        onchange="handleLogoUpload(this, 'mobile')"
-                      />
-                      <div class="upload-content">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <p>Click to upload mobile logo</p>
-                        <small>PNG, JPG, SVG (Max 2MB)</small>
-                      </div>
-                    </div>
-                    <div
-                      class="logo-preview"
-                      id="mobileLogoPreview"
-                      style="display: none"
-                    >
-                      <img id="mobileLogoImage" src="" alt="Mobile Logo" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Colors Tab -->
-              <div class="tab-panel" data-tab="colors">
-                <div class="color-selection">
-                  <div class="color-item">
-                    <label class="color-label">Primary Color</label>
-                    <div class="color-input-group">
-                      <input
-                        type="color"
-                        class="color-picker"
-                        id="primaryColorPicker"
-                        value="#4e54c8"
-                        onchange="updateColor('primary')"
-                      />
-                      <input
-                        type="text"
-                        class="color-value"
-                        id="primaryColorValue"
-                        value="#4e54c8"
-                        onchange="updateColorFromText('primary')"
-                      />
-                    </div>
-                  </div>
-
-                  <div class="color-item">
-                    <label class="color-label">Secondary Color</label>
-                    <div class="color-input-group">
-                      <input
-                        type="color"
-                        class="color-picker"
-                        id="secondaryColorPicker"
-                        value="#8f94fb"
-                        onchange="updateColor('secondary')"
-                      />
-                      <input
-                        type="text"
-                        class="color-value"
-                        id="secondaryColorValue"
-                        value="#8f94fb"
-                        onchange="updateColorFromText('secondary')"
-                      />
-                    </div>
-                  </div>
-
-                  <div class="color-item">
-                    <label class="color-label">Tertiary Color</label>
-                    <div class="color-input-group">
-                      <input
-                        type="color"
-                        class="color-picker"
-                        id="tertiaryColorPicker"
-                        value="#19b78a"
-                        onchange="updateColor('tertiary')"
-                      />
-                      <input
-                        type="text"
-                        class="color-value"
-                        id="tertiaryColorValue"
-                        value="#19b78a"
-                        onchange="updateColorFromText('tertiary')"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="color-guide">
-                  <h4 class="h4-headline">Color Usage Guide</h4>
-                  <div class="color-guide-list">
-                    <div class="guide-item">
-                      <div class="guide-color primary-demo"></div>
-                      <div class="guide-text">
-                        <strong>Primary Colour:</strong> Used for main actions
-                        and highlights
-                      </div>
-                    </div>
-                    <div class="guide-item">
-                      <div class="guide-color secondary-demo"></div>
-                      <div class="guide-text">
-                        <strong>Secondary Colour:</strong> Used for secondary
-                        buttons and accents
-                      </div>
-                    </div>
-                    <div class="guide-item">
-                      <div class="guide-color tertiary-demo"></div>
-                      <div class="guide-text">
-                        <strong>Tertiary Colour:</strong> Used for alerts and
-                        informational messages
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Font Tab -->
-              <div class="tab-panel" data-tab="font">
-                <div class="font-selection">
-                  <div class="font-item">
-                    <div class="default-font-option">
-                      <input
-                        type="checkbox"
-                        id="useDefaultFont"
-                        checked
-                        onchange="toggleFontSelection()"
-                      />
-                      <label for="useDefaultFont" class="checkbox-label"
-                        >Use Default Theme Font</label
-                      >
-                    </div>
-
-                    <div
-                      class="custom-font-selection"
-                      id="customFontSelection"
-                      style="display: none"
-                    >
-                      <label class="form-label">Custom Font Family</label>
-                      <input
-                        type="text"
-                        class="form-input"
-                        id="fontSearchInput"
-                        placeholder="Search Google fonts..."
-                        onchange="updateCustomFont()"
-                      />
-                    </div>
-                  </div>
-                  <div class="font-preview-area">
-                    <div class="font-preview-text" id="fontPreviewText">
-                      <h3>Sample Heading Text</h3>
-                      <p>
-                        This is a sample paragraph text to show how the selected
-                        font will look in your website content.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Step 4: Plugin Settings -->
-          <div class="step-content" data-step="4">
-            <div class="step-header">
-              <h1 class="h3-headline">Plugins</h1>
-              <p class="p-text">Select the plugins you want to enable</p>
-            </div>
-
-            <div id="pluginSections">
-              <!-- Plugins will be loaded here from JSON -->
-            </div>
-          </div>
-
-          <!-- Step 5: Sample Data -->
-          <div class="step-content" data-step="5">
-            <div class="step-header">
-              <h1 class="h3-headline">Sample Data</h1>
-              <p class="p-text">
-                Install sample data to quickly see how your website will look
-                with content.
-              </p>
-            </div>
-
-            <div class="sample-data-selection">
-              <div
-                class="sample-item sample-clickable"
-                data-sample="with_sample"
-                onclick="selectSampleData('with_sample')"
-              >
-                <div class="sample-card">
-                  <div class="sample-info">
-                    <h4 class="sample-title">
-                      Yes I will be using sample data
-                    </h4>
-                    <p class="sample-description">
-                      Install demo products and content to see how your store
-                      will look
-                    </p>
-                  </div>
-                  <div class="sample-actions">
-                    <div
-                      class="sample-radio-visual"
-                      id="with-sample-radio"
-                    ></div>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                class="sample-item sample-clickable"
-                data-sample="without_sample"
-                onclick="selectSampleData('without_sample')"
-              >
-                <div class="sample-card">
-                  <div class="sample-info">
-                    <h4 class="sample-title">
-                      No, I want to populate my own data
-                    </h4>
-                    <p class="sample-description">
-                      Start with a clean store and add your own products and
-                      content
-                    </p>
-                  </div>
-                  <div class="sample-actions">
-                    <div
-                      class="sample-radio-visual"
-                      id="without-sample-radio"
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Step 6: Summary -->
-          <div class="step-content" data-step="6">
-            <div class="step-header">
-              <h1 class="h3-headline">Store Information</h1>
-              <p class="p-text">
-                Review your configuration before installation
-              </p>
-            </div>
-
-            <div class="summary-display">
-              <div class="summary-item">
-                <h4 class="h4-headline">
-                  Store Name: <span id="summary-store-name">a</span>
-                </h4>
-              </div>
-
-              <div class="summary-item">
-                <h4 class="h4-headline">System Options</h4>
-                <p class="p-text">
-                  Magento Version: <span id="summary-version">2_4_7</span>
-                </p>
-              </div>
-
-              <div class="summary-item">
-                <h4 class="h4-headline">Styles</h4>
-                <p class="p-text">
-                  Selected Theme: <span id="summary-selected-theme">Luma</span>
-                </p>
-                <p class="p-text">Logos Uploaded:</p>
-                <ul class="summary-list">
-                  <li>
-                    Desktop Logo:
-                    <span id="summary-desktop-logo"
-                      >No desktop logo uploaded</span
-                    >
-                  </li>
-                  <li>
-                    Mobile Logo:
-                    <span id="summary-mobile-logo"
-                      >No mobile logo uploaded</span
-                    >
-                  </li>
+        <!-- Sidebar -->
+        <div class="wizard-sidebar">
+            <div class="wizard-steps">
+                <h3 class="h5-headline color-second">Installation Steps</h3>
+                <ul class="step-list">
+                    <li class="step-item active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-content-wrapper">
+                            <div class="step-title">Platform Selection</div>
+                            <div class="step-description">Choose your platform</div>
+                        </div>
+                    </li>
+                    <li class="step-item" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-content-wrapper">
+                            <div class="step-title">Configuration</div>
+                            <div class="step-description">Setup your website</div>
+                        </div>
+                    </li>
+                    <li class="step-item" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-content-wrapper">
+                            <div class="step-title">Installation</div>
+                            <div class="step-description">Deploy your site</div>
+                        </div>
+                    </li>
                 </ul>
-                <p class="p-text">Brand Colours:</p>
-                <ul class="summary-list">
-                  <li>
-                    Primary Colour:
-                    <span id="summary-primary-color">#4e54c8</span>
-                  </li>
-                  <li>
-                    Secondary Colour:
-                    <span id="summary-secondary-color">#8f94fb</span>
-                  </li>
-                  <li>
-                    Tertiary Colour:
-                    <span id="summary-tertiary-color">#19b78a</span>
-                  </li>
-                </ul>
-                <p class="p-text">
-                  Fonts:
-                  <span id="summary-fonts">Using Default Theme Font</span>
-                </p>
-              </div>
-
-              <div class="summary-item">
-                <h4 class="h4-headline">Sample Data</h4>
-                <p class="p-text">
-                  Sample Data Option:
-                  <span id="summary-sample-data">Yes, using sample data</span>
-                </p>
-              </div>
             </div>
-          </div>
+
+            <!-- Features -->
+            <div class="wizard-features">
+                <h4 class="h5-headline color-fourth">Features</h4>
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <i class="fas fa-rocket color-fourth"></i>
+                        <span>Fastest Hosting</span>
+                    </li>
+                    <li class="feature-item">
+                        <i class="fas fa-shield-alt color-fourth"></i>
+                        <span>PCI Compliant</span>
+                    </li>
+                    <li class="feature-item">
+                        <i class="fas fa-globe color-fourth"></i>
+                        <span>Global Presence</span>
+                    </li>
+                    <li class="feature-item">
+                        <i class="fas fa-cog color-fourth"></i>
+                        <span>Fully Featured</span>
+                    </li>
+                </ul>
+            </div>
         </div>
 
-        <!-- Navigation -->
-        <div class="wizard-navigation">
-          <button class="btn btn-secondary" id="prevBtn" disabled>
-            <i class="fas fa-arrow-left"></i>
-            Back
-          </button>
-          <div class="nav-info">
-            <span class="current-step">Step 1 of 6</span>
-          </div>
-          <button class="btn btn-primary" id="nextBtn">
-            Next Step
-            <i class="fas fa-arrow-right"></i>
-          </button>
-        </div>
-      </div>
-    </div>
+            <!-- Main Content Area -->
+            <div class="wizard-content">
+                <!-- Progress Bar -->
+                <div class="progress-container">
+                    <div class="progress-wrapper">
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="progress-text">Step 1 of 3 - Platform Selection</div>
+                    </div>
+                </div>
 
-    <!-- Installation Modal -->
-    <div class="installation-modal" id="installationModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title">Installing Your Website</h2>
+                <!-- Content Steps -->
+                <div class="wizard-main">
+                    <!-- Step 1: Platform Selection -->
+                    <div class="step-content active" data-step="1">
+                        <div class="step-header">
+                            <h1 class="h3-headline">Choose Your Platform</h1>
+                            <p class="p-text">Select the platform that best fits your website needs. Each platform has different strengths and capabilities for your e-commerce or web application.</p>
+                        </div>
+                        
+                        <div class="platform-grid">
+                            <div class="platform-card item item-border-right" data-platform="magento">
+                                <div class="item-border">
+                                    <div class="item-border__part item-border__part01"></div>
+                                    <div class="item-border__part item-border__part02"></div>
+                                    <div class="item-border__part item-border__part03"></div>
+                                </div>
+                                <div class="platform-icon">
+                                    <i class="fab fa-magento"></i>
+                                </div>
+                                <h3 class="h4-headline">Magento</h3>
+                                <p class="p-text">Powerful e-commerce platform for online stores with advanced features and scalability</p>
+                            </div>
+                            
+                            <div class="platform-card item item-border-left" data-platform="wordpress">
+                                <div class="item-border">
+                                    <div class="item-border__part item-border__part01"></div>
+                                    <div class="item-border__part item-border__part02"></div>
+                                    <div class="item-border__part item-border__part03"></div>
+                                </div>
+                                <div class="platform-icon">
+                                    <i class="fab fa-wordpress"></i>
+                                </div>
+                                <h3 class="h4-headline">WordPress</h3>
+                                <p class="p-text">Popular CMS perfect for blogs, business websites, and portfolios with extensive themes</p>
+                            </div>
+                            
+                            <div class="platform-card item item-border-bottom" data-platform="laravel">
+                                <div class="item-border">
+                                    <div class="item-border__part item-border__part01"></div>
+                                    <div class="item-border__part item-border__part02"></div>
+                                    <div class="item-border__part item-border__part03"></div>
+                                </div>
+                                <div class="platform-icon">
+                                    <i class="fab fa-laravel"></i>
+                                </div>
+                                <h3 class="h4-headline">Laravel</h3>
+                                <p class="p-text">Modern PHP framework for custom web applications with elegant syntax and features</p>
+                            </div>
+                        </div>
+
+                        <!-- Version Selection -->
+                        <div class="version-section" id="versionSection">
+                            <div class="section-header">
+                                <h3 class="h4-headline">Platform Configuration</h3>
+                                <p class="p-text">Select the version and review the required dependencies for your chosen platform.</p>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="versionSelect">Platform Version</label>
+                                    <select class="form-select" id="versionSelect">
+                                        <option value="">Choose version...</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="dependencies" id="dependenciesDisplay">
+                                <h4 class="h5-headline">Required Dependencies</h4>
+                                <div class="dependencies-grid" id="dependenciesList"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Configuration -->
+                    <div class="step-content" data-step="2">
+                        <div class="step-header">
+                            <h1 class="h3-headline">Website Configuration</h1>
+                            <p class="p-text">Configure your website settings, choose themes, and set up plugins to create your perfect website.</p>
+                        </div>
+
+                        <!-- Configuration Tabs -->
+                        <div class="config-tabs">
+                            <div class="tab-navigation">
+                                <button class="tab-button active" data-tab="store-info">
+                                    <i class="fas fa-store"></i>
+                                    Store Info
+                                </button>
+                                <button class="tab-button" data-tab="platform-config">
+                                    <i class="fas fa-cogs"></i>
+                                    Platform
+                                </button>
+                                <button class="tab-button" data-tab="styles">
+                                    <i class="fas fa-palette"></i>
+                                    Styles
+                                </button>
+                                <button class="tab-button" data-tab="plugins">
+                                    <i class="fas fa-plug"></i>
+                                    Plugins
+                                </button>
+                                <button class="tab-button" data-tab="sample-data">
+                                    <i class="fas fa-database"></i>
+                                    Sample Data
+                                </button>
+                                <button class="tab-button" data-tab="summary">
+                                    <i class="fas fa-list-check"></i>
+                                    Summary
+                                </button>
+                            </div>
+
+                            <div class="tab-content">
+                                <!-- Store Info Tab -->
+                                <div class="tab-panel active" data-tab="store-info">
+                                    <h3 class="h4-headline">Store Information</h3>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Store Name</label>
+                                            <input type="text" class="form-input" id="storeName" placeholder="Enter your store name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Store URL</label>
+                                            <input type="text" class="form-input" id="storeUrl" placeholder="yourstore.com">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Admin Email</label>
+                                            <input type="email" class="form-input" id="adminEmail" placeholder="admin@yourstore.com">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Admin Password</label>
+                                            <input type="password" class="form-input" id="adminPassword" placeholder="Enter secure password">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Store Description</label>
+                                        <textarea class="form-textarea" id="storeDescription" placeholder="Brief description of your store"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Platform Config Tab -->
+                                <div class="tab-panel" data-tab="platform-config">
+                                    <h3 class="h4-headline">Platform Configuration</h3>
+                                    <div class="selected-platform-info">
+                                        <div class="platform-summary">
+                                            <div class="platform-icon-large">
+                                                <i class="fab fa-magento"></i>
+                                            </div>
+                                            <div class="platform-details">
+                                                <h4 class="h5-headline" id="selectedPlatformName">Magento</h4>
+                                                <p class="platform-version" id="selectedPlatformVersion">Version 2.4.7</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Database Name</label>
+                                            <input type="text" class="form-input" id="dbName" placeholder="website_db">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Database User</label>
+                                            <input type="text" class="form-input" id="dbUser" placeholder="db_user">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Database Password</label>
+                                            <input type="password" class="form-input" id="dbPassword" placeholder="Enter database password">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Database Host</label>
+                                            <input type="text" class="form-input" id="dbHost" value="localhost">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Styles Tab -->
+                                <div class="tab-panel" data-tab="styles">
+                                    <h3 class="h4-headline">Choose Theme</h3>
+                                    <p class="p-text">Select a theme that matches your brand and business needs. Each theme comes with unique features and customization options.</p>
+                                    
+                                    <div class="theme-grid" id="themeGrid">
+                                        <!-- Default themes for non-Magento platforms -->
+                                        <div class="theme-card default-themes" data-theme="default">
+                                            <div class="theme-preview">
+                                                <div class="theme-screenshot">
+                                                    <i class="fas fa-image"></i>
+                                                </div>
+                                            </div>
+                                            <h4 class="theme-name">Default Theme</h4>
+                                            <p class="theme-description">Clean and modern default theme perfect for any business</p>
+                                        </div>
+                                        
+                                        <div class="theme-card default-themes" data-theme="ecommerce">
+                                            <div class="theme-preview">
+                                                <div class="theme-screenshot">
+                                                    <i class="fas fa-shopping-cart"></i>
+                                                </div>
+                                            </div>
+                                            <h4 class="theme-name">E-commerce Pro</h4>
+                                            <p class="theme-description">Professional e-commerce theme with advanced features</p>
+                                        </div>
+                                        
+                                        <div class="theme-card default-themes" data-theme="business">
+                                            <div class="theme-preview">
+                                                <div class="theme-screenshot">
+                                                    <i class="fas fa-briefcase"></i>
+                                                </div>
+                                            </div>
+                                            <h4 class="theme-name">Business</h4>
+                                            <p class="theme-description">Corporate business theme for professional websites</p>
+                                        </div>
+                                        
+                                        <!-- Magento specific themes -->
+                                        <div class="theme-card magento-themes" data-theme="luma" style="display: none;">
+                                            <div class="theme-preview">
+                                                <img src="assets/img/luma.png" alt="Luma Theme" class="theme-preview-image">
+                                                <div class="theme-screenshot">
+                                                    <svg width="80" height="40" viewBox="0 0 80 40" fill="currentColor">
+                                                        <path d="M8 8h64v24H8z" stroke="currentColor" stroke-width="2" fill="none"/>
+                                                        <text x="40" y="24" text-anchor="middle" font-size="12" font-weight="bold">LUMA</text>
+                                                    </svg>
+                                                </div>
+                                                <div class="theme-badge">Default</div>
+                                            </div>
+                                            <h4 class="theme-name">Luma</h4>
+                                            <p class="theme-description">Magento's default frontend theme, offering a traditional setup with built-in compatibility for most extensions. It's a familiar choice but can be slower and more resource-intensive.</p>
+                                            <div class="theme-features">
+                                                <div class="theme-feature">
+                                                    <i class="fas fa-mobile-alt"></i>
+                                                    Fully Responsive
+                                                </div>
+                                                <div class="theme-feature">
+                                                    <i class="fas fa-palette"></i>
+                                                    Customizable Colors
+                                                </div>
+                                                <div class="theme-feature">
+                                                    <i class="fas fa-shopping-bag"></i>
+                                                    E-commerce Ready
+                                                </div>
+                                            </div>
+                                            <button class="preview-btn" onclick="openThemePreview('luma')">
+                                                <i class="fas fa-eye"></i>
+                                                Preview Theme
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="theme-card magento-themes" data-theme="hyva" style="display: none;">
+                                            <div class="theme-preview">
+                                                <img src="assets/img/hyva.webp" alt="Hyva Theme" class="theme-preview-image">
+                                                <div class="theme-screenshot">
+                                                    <svg width="80" height="40" viewBox="0 0 80 40" fill="currentColor">
+                                                        <path d="M5 20 L15 10 L25 20 L35 10 L45 20 L55 10 L65 20 L75 10" stroke="currentColor" stroke-width="3" fill="none"/>
+                                                        <text x="40" y="35" text-anchor="middle" font-size="10" font-weight="bold">HYVÄ </text>
+                                                    </svg>
+                                                </div>
+                                                <div class="theme-badge">Premium</div>
+                                            </div>
+                                            <h4 class="theme-name">Hyvä <span class="text-licence">Licence Key Needed</span></h4>
+                                            <p class="theme-description">A modern, lightweight alternative designed for speed and performance. Hyvä significantly improves site load times and user experience while reducing complexity.</p>
+                                            <div class="theme-features">
+                                                <div class="theme-feature">
+                                                    <i class="fas fa-tachometer-alt"></i>
+                                                    Ultra Fast Performance
+                                                </div>
+                                                <div class="theme-feature">
+                                                    <i class="fas fa-code"></i>
+                                                    Tailwind CSS
+                                                </div>
+                                                <div class="theme-feature">
+                                                    <i class="fas fa-mobile-alt"></i>
+                                                    Mobile First Design
+                                                </div>
+                                            </div>
+                                            <button class="preview-btn" onclick="openThemePreview('hyva')">
+                                                <i class="fas fa-eye"></i>
+                                                Preview Theme
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Plugins Tab -->
+                                <div class="tab-panel" data-tab="plugins">
+                                    <h3 class="h4-headline">Plugin Settings</h3>
+                                    <div class="plugin-list">
+                                        <div class="plugin-item">
+                                            <div class="plugin-info">
+                                                <h4 class="plugin-name">SEO Optimizer</h4>
+                                                <p class="plugin-description">Improve your search engine rankings</p>
+                                            </div>
+                                            <div class="plugin-toggle">
+                                                <input type="checkbox" id="seo-plugin" class="plugin-checkbox">
+                                                <label for="seo-plugin" class="toggle-switch"></label>
+                                            </div>
+                                        </div>
+                                        <div class="plugin-item">
+                                            <div class="plugin-info">
+                                                <h4 class="plugin-name">Security Scanner</h4>
+                                                <p class="plugin-description">Protect your website from threats</p>
+                                            </div>
+                                            <div class="plugin-toggle">
+                                                <input type="checkbox" id="security-plugin" class="plugin-checkbox">
+                                                <label for="security-plugin" class="toggle-switch"></label>
+                                            </div>
+                                        </div>
+                                        <div class="plugin-item">
+                                            <div class="plugin-info">
+                                                <h4 class="plugin-name">Performance Cache</h4>
+                                                <p class="plugin-description">Speed up your website loading</p>
+                                            </div>
+                                            <div class="plugin-toggle">
+                                                <input type="checkbox" id="cache-plugin" class="plugin-checkbox" checked>
+                                                <label for="cache-plugin" class="toggle-switch"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sample Data Tab -->
+                                <div class="tab-panel" data-tab="sample-data">
+                                    <h3 class="h4-headline">Sample Data</h3>
+                                    <p class="p-text">Install sample data to quickly see how your website will look with content.</p>
+                                    
+                                    <div class="sample-options">
+                                        <div class="sample-option">
+                                            <input type="radio" id="no-sample" name="sample-data" value="none" checked>
+                                            <label for="no-sample" class="sample-label">
+                                                <div class="sample-content">
+                                                    <h4 class="sample-title">No Sample Data</h4>
+                                                    <p class="sample-description">Start with a clean installation</p>
+                                                </div>
+                                            </label>
+                                        </div>
+                                        <div class="sample-option">
+                                            <input type="radio" id="basic-sample" name="sample-data" value="basic">
+                                            <label for="basic-sample" class="sample-label">
+                                                <div class="sample-content">
+                                                    <h4 class="sample-title">Basic Sample Data</h4>
+                                                    <p class="sample-description">Basic products and pages</p>
+                                                </div>
+                                            </label>
+                                        </div>
+                                        <div class="sample-option">
+                                            <input type="radio" id="full-sample" name="sample-data" value="full">
+                                            <label for="full-sample" class="sample-label">
+                                                <div class="sample-content">
+                                                    <h4 class="sample-title">Full Sample Data</h4>
+                                                    <p class="sample-description">Complete demo store with products</p>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Summary Tab -->
+                                <div class="tab-panel" data-tab="summary">
+                                    <h3 class="h4-headline">Configuration Summary</h3>
+                                    <div class="summary-sections">
+                                        <div class="summary-section">
+                                            <h4 class="summary-title">Platform</h4>
+                                            <div class="summary-content" id="summary-platform"></div>
+                                        </div>
+                                        <div class="summary-section">
+                                            <h4 class="summary-title">Store Information</h4>
+                                            <div class="summary-content" id="summary-store"></div>
+                                        </div>
+                                        <div class="summary-section">
+                                            <h4 class="summary-title">Theme</h4>
+                                            <div class="summary-content" id="summary-theme"></div>
+                                        </div>
+                                        <div class="summary-section">
+                                            <h4 class="summary-title">Plugins</h4>
+                                            <div class="summary-content" id="summary-plugins"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Installation -->
+                    <div class="step-content" data-step="3">
+                        <div class="step-header">
+                            <h1 class="h3-headline">Installation Progress</h1>
+                            <p class="p-text">Your website is being created with the selected configuration. Please wait while we set up everything for you.</p>
+                        </div>
+
+                        <div class="installation-progress">
+                            <div class="installation-steps">
+                                <div class="install-step active">
+                                    <div class="install-icon">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <div class="install-text">
+                                        <h4>Downloading Platform</h4>
+                                        <p>Downloading and extracting files...</p>
+                                    </div>
+                                    <div class="install-status">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </div>
+                                </div>
+                                <div class="install-step">
+                                    <div class="install-icon">
+                                        <i class="fas fa-database"></i>
+                                    </div>
+                                    <div class="install-text">
+                                        <h4>Setting up Database</h4>
+                                        <p>Creating database structure...</p>
+                                    </div>
+                                    <div class="install-status">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                </div>
+                                <div class="install-step">
+                                    <div class="install-icon">
+                                        <i class="fas fa-cog"></i>
+                                    </div>
+                                    <div class="install-text">
+                                        <h4>Configuring Platform</h4>
+                                        <p>Applying configuration settings...</p>
+                                    </div>
+                                    <div class="install-status">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                </div>
+                                <div class="install-step">
+                                    <div class="install-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="install-text">
+                                        <h4>Installation Complete</h4>
+                                        <p>Your website is ready!</p>
+                                    </div>
+                                    <div class="install-status">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="wizard-navigation">
+                    <button class="btn btn-secondary" id="prevBtn" disabled>
+                        <i class="fas fa-arrow-left"></i>
+                        Previous
+                    </button>
+                    <div class="nav-info">
+                        <span class="current-step">Step 1 of 3</span>
+                    </div>
+                    <button class="btn btn-primary" id="nextBtn" disabled>
+                        Next
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">License Key</label>
-            <input
-              type="text"
-              class="form-input"
-              id="licenseKeyInput"
-              placeholder="Enter your license key"
-              required
-            />
-          </div>
-          <div class="modal-actions">
-            <button class="btn btn-secondary" onclick="closeLicenseModal()">
-              Cancel
-            </button>
-            <button class="btn btn-primary" onclick="saveLicenseKey()">
-              Save License Key
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Theme Preview Modal -->
     <div class="theme-preview-modal" id="themePreviewModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title" id="modalThemeTitle">Theme Preview</h2>
-          <button class="modal-close" onclick="closeThemePreview()">
-            &times;
-          </button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalThemeTitle">Theme Preview</h2>
+                <button class="modal-close" onclick="closeThemePreview()">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Theme Tabs -->
+                <div class="theme-tabs">
+                    <button class="theme-tab-btn active" onclick="switchThemeTab('preview')">
+                        <i class="fas fa-eye"></i>
+                        Preview
+                    </button>
+                    <button class="theme-tab-btn" onclick="switchThemeTab('styling')">
+                        <i class="fas fa-palette"></i>
+                        Styling
+                    </button>
+                </div>
+                
+                <!-- Preview Tab -->
+                <div class="theme-tab-content active" id="previewTab">
+                    <div class="preview-container">
+                        <div class="preview-section">
+                            <div class="preview-header">
+                                <i class="fas fa-desktop"></i>
+                                Desktop View
+                            </div>
+                            <div class="preview-frame">
+                                <img id="desktopPreview" src="" alt="Desktop Preview" class="preview-image">
+                            </div>
+                        </div>
+                        
+                        <div class="preview-section">
+                            <div class="preview-header">
+                                <i class="fas fa-mobile-alt"></i>
+                                Mobile View
+                            </div>
+                            <div class="preview-frame">
+                                <img id="mobilePreview" src="" alt="Mobile Preview" class="preview-image">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Styling Tab -->
+                <div class="theme-tab-content" id="stylingTab">
+                    <!-- Logo Upload -->
+                    <div class="styling-section">
+                        <h3 class="styling-title">Logo Upload</h3>
+                        <div class="logo-upload" onclick="document.getElementById('logoFile').click()">
+                            <input type="file" id="logoFile" accept="image/*" onchange="handleLogoUpload(this)">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-text">
+                                Click to upload your logo<br>
+                                <small>Supports PNG, JPG, SVG (Max 2MB)</small>
+                            </div>
+                        </div>
+                        <div class="logo-preview" id="logoPreview" style="display: none;">
+                            <img id="logoImage" src="" alt="Logo Preview">
+                        </div>
+                    </div>
+                    
+                    <!-- Color Selection -->
+                    <div class="styling-section">
+                        <h3 class="styling-title">Color Scheme</h3>
+                        <div class="color-options">
+                            <div class="color-group">
+                                <label class="color-label">Primary Color</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" class="color-picker" id="primaryColor" value="#009bde" onchange="updateColorValue('primaryColor', 'primaryValue')">
+                                    <input type="text" class="color-value" id="primaryValue" value="#009bde" onchange="updateColorPicker('primaryValue', 'primaryColor')">
+                                </div>
+                            </div>
+                            
+                            <div class="color-group">
+                                <label class="color-label">Secondary Color</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" class="color-picker" id="secondaryColor" value="#ff7101" onchange="updateColorValue('secondaryColor', 'secondaryValue')">
+                                    <input type="text" class="color-value" id="secondaryValue" value="#ff7101" onchange="updateColorPicker('secondaryValue', 'secondaryColor')">
+                                </div>
+                            </div>
+                            
+                            <div class="color-group">
+                                <label class="color-label">Text Color</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" class="color-picker" id="textColor" value="#0f488a" onchange="updateColorValue('textColor', 'textValue')">
+                                    <input type="text" class="color-value" id="textValue" value="#0f488a" onchange="updateColorPicker('textValue', 'textColor')">
+                                </div>
+                            </div>
+                            
+                            <div class="color-group">
+                                <label class="color-label">Background Color</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" class="color-picker" id="bgColor" value="#ffffff" onchange="updateColorValue('bgColor', 'bgValue')">
+                                    <input type="text" class="color-value" id="bgValue" value="#ffffff" onchange="updateColorPicker('bgValue', 'bgColor')">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Font Selection -->
+                    <div class="styling-section">
+                        <h3 class="styling-title">Typography</h3>
+                        <div class="font-options">
+                            <div class="font-selector">
+                                <label class="color-label">Heading Font</label>
+                                <select class="font-select" id="headingFont" onchange="updateFontPreview()">
+                                    <option value="Montserrat">Montserrat</option>
+                                    <option value="Open Sans">Open Sans</option>
+                                    <option value="Roboto">Roboto</option>
+                                    <option value="Lato">Lato</option>
+                                    <option value="Poppins">Poppins</option>
+                                    <option value="Nunito">Nunito</option>
+                                </select>
+                                <div class="font-preview">
+                                    <h3 id="headingPreview" style="font-family: Montserrat;">Sample Heading</h3>
+                                </div>
+                            </div>
+                            
+                            <div class="font-selector">
+                                <label class="color-label">Body Font</label>
+                                <select class="font-select" id="bodyFont" onchange="updateFontPreview()">
+                                    <option value="Montserrat">Montserrat</option>
+                                    <option value="Open Sans">Open Sans</option>
+                                    <option value="Roboto">Roboto</option>
+                                    <option value="Lato">Lato</option>
+                                    <option value="Source Sans Pro">Source Sans Pro</option>
+                                    <option value="Inter">Inter</option>
+                                </select>
+                                <div class="font-preview">
+                                    <p id="bodyPreview" style="font-family: Montserrat;">This is sample body text to show how the font will look in paragraphs and content areas.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="modal-body">
-          <!-- Theme Tabs -->
-          <div class="theme-tabs">
-            <button
-              class="theme-tab-btn active"
-              onclick="switchThemeTab('preview')"
-            >
-              <i class="fas fa-eye"></i>
-              Preview
-            </button>
-            <button class="theme-tab-btn" onclick="switchThemeTab('styling')">
-              <i class="fas fa-palette"></i>
-              Styling
-            </button>
-          </div>
-
-          <!-- Preview Tab -->
-          <div class="theme-tab-content active" id="previewTab">
-            <div class="preview-container">
-              <div class="preview-section">
-                <div class="preview-header">
-                  <i class="fas fa-desktop"></i>
-                  Desktop View
-                </div>
-                <div class="preview-frame">
-                  <img
-                    id="desktopPreview"
-                    src=""
-                    alt="Desktop Preview"
-                    class="preview-image"
-                  />
-                </div>
-              </div>
-
-              <div class="preview-section">
-                <div class="preview-header">
-                  <i class="fas fa-mobile-alt"></i>
-                  Mobile View
-                </div>
-                <div class="preview-frame">
-                  <img
-                    id="mobilePreview"
-                    src=""
-                    alt="Mobile Preview"
-                    class="preview-image"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Styling Tab -->
-          <div class="theme-tab-content" id="stylingTab">
-            <!-- Logo Upload -->
-            <div class="styling-section">
-              <h3 class="styling-title">Logo Upload</h3>
-              <div
-                class="logo-upload"
-                onclick="document.getElementById('logoFile').click()"
-              >
-                <input
-                  type="file"
-                  id="logoFile"
-                  accept="image/*"
-                  onchange="handleLogoUpload(this)"
-                />
-                <div class="upload-icon">
-                  <i class="fas fa-cloud-upload-alt"></i>
-                </div>
-                <div class="upload-text">
-                  Click to upload your logo<br />
-                  <small>Supports PNG, JPG, SVG (Max 2MB)</small>
-                </div>
-              </div>
-              <div class="logo-preview" id="logoPreview" style="display: none">
-                <img id="logoImage" src="" alt="Logo Preview" />
-              </div>
-            </div>
-
-            <!-- Color Selection -->
-            <div class="styling-section">
-              <h3 class="styling-title">Color Scheme</h3>
-              <div class="color-options">
-                <div class="color-group">
-                  <label class="color-label">Primary Color</label>
-                  <div class="color-picker-wrapper">
-                    <input
-                      type="color"
-                      class="color-picker"
-                      id="primaryColor"
-                      value="#4e54c8"
-                      onchange="updateColorValue('primaryColor', 'primaryValue')"
-                    />
-                    <input
-                      type="text"
-                      class="color-value"
-                      id="primaryValue"
-                      value="#4e54c8"
-                      onchange="updateColorPicker('primaryValue', 'primaryColor')"
-                    />
-                  </div>
-                </div>
-
-                <div class="color-group">
-                  <label class="color-label">Secondary Color</label>
-                  <div class="color-picker-wrapper">
-                    <input
-                      type="color"
-                      class="color-picker"
-                      id="secondaryColor"
-                      value="#8f94fb"
-                      onchange="updateColorValue('secondaryColor', 'secondaryValue')"
-                    />
-                    <input
-                      type="text"
-                      class="color-value"
-                      id="secondaryValue"
-                      value="#8f94fb"
-                      onchange="updateColorPicker('secondaryValue', 'secondaryColor')"
-                    />
-                  </div>
-                </div>
-
-                <div class="color-group">
-                  <label class="color-label">Tertiary Color</label>
-                  <div class="color-picker-wrapper">
-                    <input
-                      type="color"
-                      class="color-picker"
-                      id="tertiaryColor"
-                      value="#19b78a"
-                      onchange="updateColorValue('tertiaryColor', 'tertiaryValue')"
-                    />
-                    <input
-                      type="text"
-                      class="color-value"
-                      id="tertiaryValue"
-                      value="#19b78a"
-                      onchange="updateColorPicker('tertiaryValue', 'tertiaryColor')"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Font Selection -->
-            <div class="styling-section">
-              <h3 class="styling-title">Typography</h3>
-              <div class="font-options">
-                <div class="font-selector">
-                  <label class="color-label">Font Family</label>
-                  <select
-                    class="font-select"
-                    id="fontFamily"
-                    onchange="updateFontPreview()"
-                  >
-                    <option value="default">Using Default Theme Font</option>
-                    <option value="Montserrat">Montserrat</option>
-                    <option value="Open Sans">Open Sans</option>
-                    <option value="Roboto">Roboto</option>
-                    <option value="Lato">Lato</option>
-                    <option value="Poppins">Poppins</option>
-                    <option value="Nunito">Nunito</option>
-                  </select>
-                  <div class="font-preview">
-                    <p id="fontPreview" style="font-family: Montserrat">
-                      This is sample text to show how the font will look.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Custom JavaScript -->
     <script src="assets/js/script.js"></script>
-  </body>
+</body>
 </html>
