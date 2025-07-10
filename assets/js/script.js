@@ -1,351 +1,66 @@
-// Update color functions to include tertiary
-function updateColor(colorType) {
-  const picker = document.getElementById(`${colorType}ColorPicker`);
-  const value = document.getElementById(`${colorType}ColorValue`);
-  
-  value.value = picker.value;
-  saveColorToWizardData(colorType, picker.value);
-  updateColorGuide();
-}
+// Enhanced Website Creation Wizard JavaScript - 6 Steps
 
-function updateColorFromText(colorType) {
-  const picker = document.getElementById(`${colorType}ColorPicker`);
-  const value = document.getElementById(`${colorType}ColorValue`);
-  
-  if (/^#[0-9A-F]{6}$/i.test(value.value)) {
-    picker.value = value.value;
-    saveColorToWizardData(colorType, value.value);
-    updateColorGuide();
-  }
-}
+// Global variables
+let currentStep = 1;
+let currentLicensePlugin = null;
+let wizardData = {
+  platform: null,
+  version: null,
+  storeInfo: {
+    name: "Sample Store",
+  },
+  theme: "luma",
+  plugins: {},
+  licenseKeys: {},
+  sampleData: "with_sample",
+  styling: {
+    colors: {
+      primary: "#4e54c8",
+      secondary: "#8f94fb",
+      tertiary: "#19b78a",
+    },
+    fonts: "default",
+    useDefaultFont: true,
+    logos: {
+      // Ensure logos property exists
+      desktop: null,
+      mobile: null,
+    },
+  },
+};
 
-function saveColorToWizardData(colorType, colorValue) {
-  wizardData.styling = wizardData.styling || {};
-  wizardData.styling.colors = wizardData.styling.colors || {};
-  wizardData.styling.colors[colorType] = colorValue;
-  
-  saveWizardData();
-  updateSummary();
-}
+// Plugin data (loaded from JSON or fallback)
+let pluginData = {};
 
-function updateColorGuide() {
-  // Update color guide swatches
-  const primaryColor = document.getElementById('primaryColorPicker').value;
-  const secondaryColor = document.getElementById('secondaryColorPicker').value;
-  const tertiaryColor = document.getElementById('tertiaryColorPicker').value;
-  
-  if (document.querySelector('.primary-demo')) {
-    document.querySelector('.primary-demo').style.backgroundColor = primaryColor;
-  }
-  if (document.querySelector('.secondary-demo')) {
-    document.querySelector('.secondary-demo').style.backgroundColor = secondaryColor;
-  }
-  if (document.querySelector('.tertiary-demo')) {
-    document.querySelector('.tertiary-demo').style.backgroundColor = tertiaryColor;
-  }
-}
-
-// Start installation with modal
-function startInstallation() {
-  $("#installationModal").addClass("show");
-  $("body").addClass("modal-open");
-  
-  const steps = [
-    { id: "downloadStep", delay: 1000 },
-    { id: "databaseStep", delay: 3000 },
-    { id: "configStep", delay: 5000 },
-    { id: "completeStep", delay: 7000 },
-  ];
-
-  steps.forEach((step, index) => {
-    setTimeout(() => {
-      // Complete previous step
-      if (index > 0) {
-        const prevStep = $(`#${steps[index - 1].id}`);
-        prevStep.removeClass("active").addClass("completed");
-        prevStep
-          .find(".install-status i")
-          .removeClass("fa-spinner fa-spin")
-          .addClass("fa-check");
-      }
-
-      // Activate current step
-      const currentStepEl = $(`#${step.id}`);
-      currentStepEl.addClass("active");
-      currentStepEl
-        .find(".install-status i")
-        .removeClass("fa-clock")
-        .addClass("fa-spinner fa-spin");
-
-      // Complete last step and show completion
-      if (index === steps.length - 1) {
-        setTimeout(() => {
-          currentStepEl.removeClass("active").addClass("completed");
-          currentStepEl
-            .find(".install-status i")
-            .removeClass("fa-spinner fa-spin")
-            .addClass("fa-check");
-
-          // Hide installation steps and show completion
-          $(".installation-steps").hide();
-          $("#installationComplete").show();
-        }, 2000);
-      }
-    }, step.delay);
-  });
-}
-
-// View website function
-function viewWebsite() {
-  const storeName = wizardData.storeInfo?.name || "Your Website";
-  alert(`Opening ${storeName}...`);
-  // Here you would normally redirect to the actual website
-  // window.open('https://yourwebsite.com', '_blank');
-  
-  // Reset wizard for demo
-  if (confirm("Would you like to create another website?")) {
-    resetWizard();
-  } else {
-    $("#installationModal").removeClass("show");
-    $("body").removeClass("modal-open");
-  }
-}
-
-// Update summary function
-function updateSummary() {
-  $("#summary-store-name").text(wizardData.storeInfo?.name || "a");
-  $("#summary-version").text(wizardData.version || "2_4_7");
-  $("#summary-selected-theme").text(wizardData.theme || "Luma");
-  
-  // Sample data summary
-  const sampleDataText = wizardData.sampleData === 'with_sample' ? 
-    'Yes, using sample data' : 'No, using own data';
-  $("#summary-sample-data").text(sampleDataText);
-  
-  if (wizardData.styling) {
-    // Logo summary
-    if (wizardData.styling.logos) {
-      $("#summary-desktop-logo").text(wizardData.styling.logos.desktop ? "Desktop logo uploaded" : "No desktop logo uploaded");
-      $("#summary-mobile-logo").text(wizardData.styling.logos.mobile ? "Mobile logo uploaded" : "No mobile logo uploaded");
-    }
-    
-    // Color summary
-    if (wizardData.styling.colors) {
-      $("#summary-primary-color").text(wizardData.styling.colors.primary || "#4e54c8");
-      $("#summary-secondary-color").text(wizardData.styling.colors.secondary || "#8f94fb");
-      $("#summary-tertiary-color").text(wizardData.styling.colors.tertiary || "#19b78a");
-    }
-    
-    // Font summary
-    if (wizardData.styling.useDefaultFont) {
-      $("#summary-fonts").text('Using Default Theme Font');
-    } else {
-      $("#summary-fonts").text(wizardData.styling.fonts || 'Custom Font');
-    }
-  }
-}
-
-// Update theme grid based on selected platform
-function updateThemeGrid() {
-  if (wizardData.platform === "magento") {
-    $(".default-themes").hide();
-    $(".magento-themes").show();
-    
-    // Set default theme for Magento if none selected
-    if (!wizardData.theme) {
-      selectTheme('luma');
-    }
-  } else {
-    $(".default-themes").show();
-    $(".magento-themes").hide();
-    
-    // Set default theme for other platforms if none selected
-    if (!wizardData.theme || wizardData.theme === 'luma' || wizardData.theme === 'hyva') {
-      selectTheme('default');
-    }
-  }
-  
-  // Update visual selection
-  setTimeout(() => {
-    if (wizardData.theme) {
-      document.querySelector(`[data-theme="${wizardData.theme}"]`).classList.add('selected');
-    }
-  }, 100);
-  
-  saveWizardData();
-  updateNextButton();
-}
-
-// Populate form fields from saved data
-function populateFormFields() {
-  // Store info
-  if (wizardData.storeInfo) {
-    const storeName = wizardData.storeInfo.name || "Sample Store";
-    $("#storeName").val(storeName);
-    
-    // Ensure wizardData is updated with current value
-    wizardData.storeInfo.name = storeName;
-    saveWizardData();
-  }
-
-  // Platform selection
-  if (wizardData.platform) {
-    selectPlatform(wizardData.platform);
-    updateThemeGrid();
-  }
-
-  // Theme selection
-  if (wizardData.theme) {
-    selectTheme(wizardData.theme);
-  }
-
-  // Sample data
-  if (wizardData.sampleData) {
-    selectSampleData(wizardData.sampleData);
-  }
-
-  // Colors
-  if (wizardData.styling && wizardData.styling.colors) {
-    const colors = wizardData.styling.colors;
-    if (colors.primary) {
-      $("#primaryColorPicker").val(colors.primary);
-      $("#primaryColorValue").val(colors.primary);
-    }
-    if (colors.secondary) {
-      $("#secondaryColorPicker").val(colors.secondary);
-      $("#secondaryColorValue").val(colors.secondary);
-    }
-    if (colors.tertiary) {
-      $("#tertiaryColorPicker").val(colors.tertiary);
-      $("#tertiaryColorValue").val(colors.tertiary);
-    }
-    updateColorGuide();
-  }
-
-  // Fonts
-  if (wizardData.styling) {
-    if (wizardData.styling.useDefaultFont !== undefined) {
-      $("#useDefaultFont").prop('checked', wizardData.styling.useDefaultFont);
-      toggleFontSelection();
-    }
-    if (!wizardData.styling.useDefaultFont && wizardData.styling.fonts) {
-      $("#fontSearchInput").val(wizardData.styling.fonts);
-      updateCustomFont();
-    }
-  }
-
-  // Logos
-  if (wizardData.styling && wizardData.styling.logos) {
-    if (wizardData.styling.logos.desktop) {
-      $("#desktopLogoImage").attr('src', wizardData.styling.logos.desktop);
-      $("#desktopLogoPreview").show();
-    }
-    if (wizardData.styling.logos.mobile) {
-      $("#mobileLogoImage").attr('src', wizardData.styling.logos.mobile);
-      $("#mobileLogoPreview").show();
-    }
-  }
-
-  // Update plugin states after rendering
-  setTimeout(() => {
-    if (wizardData.plugins) {
-      Object.entries(wizardData.plugins).forEach(([pluginId, isEnabled]) => {
-        const checkbox = $(`#${pluginId}`);
-        if (checkbox.length) {
-          checkbox.prop("checked", isEnabled);
-          if (isEnabled) {
-            checkbox.closest('.plugin-item').addClass('selected');
-          }
-        }
-      });
-    }
-    
-    // Force validation update after everything is loaded
-    updateNextButton();
-  }, 100);
-}
-
-// Update navigation buttons
-function updateNavigation() {
-  $("#prevBtn").prop("disabled", currentStep === 1);
-
-  if (currentStep === 6) {
-    $("#nextBtn").html('<i class="fas fa-rocket"></i> Start Installation');
-  } else {
-    $("#nextBtn").html('Next Step <i class="fas fa-arrow-right"></i>');
-  }
-
-  updateNextButton();
-}
-
-// Emergency fallback to ensure button works
-setTimeout(() => {
-  console.log('=== EMERGENCY FALLBACK ===');
-  const nextBtn = $("#nextBtn");
-  
-  if (nextBtn.length > 0) {
-    // Force enable button for step 1
-    nextBtn.prop("disabled", false);
-    nextBtn.removeClass('disabled');
-    nextBtn.css({
-      'opacity': '1',
-      'pointer-events': 'auto',
-      'cursor': 'pointer',
-      'background': '#ff7101'
-    });
-    
-    console.log('Emergency fallback: Button force enabled');
-    console.log('Button disabled property:', nextBtn.prop('disabled'));
-    console.log('Button classes:', nextBtn.attr('class'));
-  } else {
-    console.error('Emergency fallback: Button not found');
-  }
-}, 1000);
-
-// Make functions global for onclick handlers
-window.openThemePreview = openThemePreview;
-window.closeThemePreview = closeThemePreview;
-window.switchThemeTab = switchThemeTab;
-window.handleLogoUpload = handleLogoUpload;
-window.updateColorValue = updateColorValue;
-window.updateColorPicker = updateColorPicker;
-window.updateFontPreview = updateFontPreview;
-window.closeSuccessMessage = closeSuccessMessage;
-window.openLicenseModal = openLicenseModal;
-window.closeLicenseModal = closeLicenseModal;
-window.saveLicenseKey = saveLicenseKey;
-window.switchStyleTab = switchStyleTab;
-window.getSelectedTheme = getSelectedTheme;
-window.updateColor = updateColor;
-window.updateColorFromText = updateColorFromText;
-window.updateFontFamily = updateFontFamily;
-window.selectTheme = selectTheme;
-window.selectSampleData = selectSampleData;
-window.toggleFontSelection = toggleFontSelection;
-window.updateCustomFont = updateCustomFont;
-window.viewWebsite = viewWebsite;// Enhanced Website Creation Wizard JavaScript - 6 Steps
-
-// Update placeholders
+// Theme preview data
 const themePreviewData = {
   luma: {
     name: "Luma Theme",
-    desktop: "https://placehold.co/800x600/f8f9fa/6c757d?text=Luma+Desktop+Preview",
-    mobile: "https://placehold.co/400x600/f8f9fa/6c757d?text=Luma+Mobile+Preview",
+    desktop:
+      "https://placehold.co/800x600/f8f9fa/6c757d?text=Luma+Desktop+Preview",
+    mobile:
+      "https://placehold.co/400x600/f8f9fa/6c757d?text=Luma+Mobile+Preview",
   },
   hyva: {
     name: "Hyvä Theme",
-    desktop: "https://placehold.co/800x600/e3f2fd/1976d2?text=Hyva+Desktop+Preview",
-    mobile: "https://placehold.co/400x600/e3f2fd/1976d2?text=Hyva+Mobile+Preview",
+    desktop:
+      "https://placehold.co/800x600/e3f2fd/1976d2?text=Hyva+Desktop+Preview",
+    mobile:
+      "https://placehold.co/400x600/e3f2fd/1976d2?text=Hyva+Mobile+Preview",
   },
   default: {
     name: "Default Theme",
-    desktop: "https://placehold.co/800x600/ffffff/666666?text=Default+Desktop+Preview",
-    mobile: "https://placehold.co/400x600/ffffff/666666?text=Default+Mobile+Preview",
+    desktop:
+      "https://placehold.co/800x600/ffffff/666666?text=Default+Desktop+Preview",
+    mobile:
+      "https://placehold.co/400x600/ffffff/666666?text=Default+Mobile+Preview",
   },
   ecommerce: {
     name: "E-commerce Pro",
-    desktop: "https://placehold.co/800x600/f0f0f0/333333?text=Ecommerce+Desktop+Preview",
-    mobile: "https://placehold.co/400x600/f0f0f0/333333?text=Ecommerce+Mobile+Preview",
+    desktop:
+      "https://placehold.co/800x600/f0f0f0/333333?text=Ecommerce+Desktop+Preview",
+    mobile:
+      "https://placehold.co/400x600/f0f0f0/333333?text=Ecommerce+Mobile+Preview",
   },
 };
 
@@ -463,59 +178,28 @@ const dependencyIcons = {
   opensearch: "fas fa-search",
 };
 
-// Global variables
-let currentStep = 1;
-let currentLicensePlugin = null;
-let wizardData = {
-  platform: null,
-  version: null,
-  storeInfo: {
-    name: "Sample Store"
-  },
-  theme: "luma",
-  plugins: {},
-  licenseKeys: {},
-  sampleData: "with_sample",
-  styling: {
-    colors: {
-      primary: "#4e54c8",
-      secondary: "#8f94fb",
-      tertiary: "#19b78a"
-    },
-    fonts: "default",
-    useDefaultFont: true
-  }
-};
-
-// Plugin data (loaded from JSON)
-let pluginData = {};
-
 // Initialize wizard
 $(document).ready(function () {
-  console.log('DOM Ready - Initializing wizard...');
-  
-  // Set default values first
-  wizardData.storeInfo = wizardData.storeInfo || {};
-  wizardData.storeInfo.name = "Sample Store";
-  
+  console.log("DOM Ready - Initializing wizard...");
+
   loadPluginData();
   loadWizardData();
   initializeEventHandlers();
   updateDisplay();
-  
+
   // Force populate store name field
   $("#storeName").val(wizardData.storeInfo.name);
-  
+
   // Multiple attempts to ensure button is enabled
   updateNextButton();
-  
+
   setTimeout(() => {
-    console.log('Second attempt to update button...');
+    console.log("Second attempt to update button...");
     updateNextButton();
   }, 100);
-  
+
   setTimeout(() => {
-    console.log('Third attempt to update button...');
+    console.log("Third attempt to update button...");
     updateNextButton();
   }, 500);
 });
@@ -523,11 +207,11 @@ $(document).ready(function () {
 // Load plugin data from JSON
 async function loadPluginData() {
   try {
-    const response = await fetch('assets/data/plugins-data.json');
+    const response = await fetch("assets/data/plugins-data.json");
     pluginData = await response.json();
     renderPluginSections();
   } catch (error) {
-    console.error('Error loading plugin data:', error);
+    console.error("Error loading plugin data:", error);
     // Fallback plugin data
     pluginData = {
       payments: {
@@ -539,10 +223,10 @@ async function loadPluginData() {
             name: "PayPal Complete Payments",
             description: "Full-stack payment solution",
             selected: true,
-            needsLicense: false
-          }
-        ]
-      }
+            needsLicense: false,
+          },
+        ],
+      },
     };
     renderPluginSections();
   }
@@ -559,21 +243,35 @@ function renderPluginSections() {
         <h3 class="plugin-section-title">${section.title}</h3>
         <p class="plugin-section-description">${section.description}</p>
         <div class="plugin-list">
-          ${section.plugins.map(plugin => `
-            <div class="plugin-item ${plugin.selected ? 'selected' : ''}" data-plugin="${plugin.id}">
+          ${section.plugins
+            .map(
+              (plugin) => `
+            <div class="plugin-item ${
+              wizardData.plugins[plugin.id] ? "selected" : ""
+            }" data-plugin="${plugin.id}">
               <div class="plugin-info">
                 <h4 class="plugin-name">${plugin.name}</h4>
                 <p class="plugin-description">${plugin.description}</p>
-                ${plugin.needsLicense ? '<p class="plugin-license-text">Requires license key</p>' : ''}
+                ${
+                  plugin.needsLicense
+                    ? '<p class="plugin-license-text">Requires license key</p>'
+                    : ""
+                }
               </div>
               <div class="plugin-controls">
                 <div class="plugin-toggle">
-                  <input type="checkbox" id="${plugin.id}" class="plugin-checkbox" ${plugin.selected ? 'checked' : ''}>
+                  <input type="checkbox" id="${
+                    plugin.id
+                  }" class="plugin-checkbox" ${
+                wizardData.plugins[plugin.id] ? "checked" : ""
+              }>
                   <label for="${plugin.id}" class="toggle-switch"></label>
                 </div>
               </div>
             </div>
-          `).join('')}
+          `
+            )
+            .join("")}
         </div>
       </div>
     `;
@@ -584,32 +282,31 @@ function renderPluginSections() {
 // Load data from localStorage
 function loadWizardData() {
   const savedData = localStorage.getItem("wizardData");
-  
-  // Set default store name first
-  wizardData.storeInfo = wizardData.storeInfo || {};
-  wizardData.storeInfo.name = "Sample Store";
-  
+
   if (savedData) {
     try {
       const parsed = JSON.parse(savedData);
       wizardData = { ...wizardData, ...parsed };
-      
+
       // Ensure store name is not empty
-      if (!wizardData.storeInfo?.name || wizardData.storeInfo.name.trim() === '') {
+      if (
+        !wizardData.storeInfo?.name ||
+        wizardData.storeInfo.name.trim() === ""
+      ) {
         wizardData.storeInfo.name = "Sample Store";
       }
-      
-      console.log('Loaded wizard data from localStorage:', wizardData);
+
+      console.log("Loaded wizard data from localStorage:", wizardData);
     } catch (e) {
-      console.error('Error parsing saved data:', e);
+      console.error("Error parsing saved data:", e);
       // Reset to default if corrupted
       wizardData.storeInfo.name = "Sample Store";
     }
   } else {
-    console.log('No saved data found, using defaults');
+    console.log("No saved data found, using defaults");
   }
-  
-  // Save the data to ensure consistency
+
+  // Save the data to ensure consistency (e.g., if defaults were applied)
   saveWizardData();
   populateFormFields();
 }
@@ -622,28 +319,27 @@ function saveWizardData() {
 // Initialize event handlers
 function initializeEventHandlers() {
   // Platform selection
-  $(".platform-card").click(function () {
+  $(".platform-card").on("click", function () {
     const platform = $(this).data("platform");
     selectPlatform(platform);
   });
 
   // Version selection
-  $("#versionSelect").change(function () {
+  $("#versionSelect").on("change", function () {
     const version = $(this).val();
     wizardData.version = version;
     saveWizardData();
 
     if (version) {
       showDependencies();
-      updateNextButton();
     } else {
       $("#dependenciesDisplay").removeClass("show");
-      updateNextButton();
     }
+    updateNextButton();
   });
 
   // Navigation buttons
-  $("#nextBtn").click(function () {
+  $("#nextBtn").on("click", function () {
     if (currentStep < 6) {
       nextStep();
     } else {
@@ -651,112 +347,87 @@ function initializeEventHandlers() {
     }
   });
 
-  $("#prevBtn").click(function () {
+  $("#prevBtn").on("click", function () {
     if (currentStep > 1) {
       prevStep();
     }
   });
 
-  // Form inputs
-  $("#storeName").on("input keyup change blur", function() {
+  // Store name input
+  $("#storeName").on("input", function () {
     const storeName = $(this).val().trim();
-    console.log('Store name input changed to:', storeName);
-    
     wizardData.storeInfo = wizardData.storeInfo || {};
     wizardData.storeInfo.name = storeName;
     saveWizardData();
     updateSummary();
-    
-    // Immediate button update
     updateNextButton();
-  });
-
-  // Theme selection (radio buttons)
-  $(document).on("change", 'input[name="theme-selection"]', function () {
-    const selectedTheme = $(this).val();
-    wizardData.theme = selectedTheme;
-    saveWizardData();
-    updateSummary();
-    updateNextButton();
-  });
-
-  // Plugin toggles
-  $(document).on("change", ".plugin-checkbox", function () {
-    const pluginId = $(this).attr("id");
-    const isChecked = $(this).is(":checked");
-    
-    // Check if plugin needs license and is being enabled
-    const pluginNeedsLicense = checkIfPluginNeedsLicense(pluginId);
-    
-    if (isChecked && pluginNeedsLicense && !wizardData.licenseKeys[pluginId]) {
-      // Show license modal immediately
-      const pluginName = getPluginName(pluginId);
-      openLicenseModal(pluginId, pluginName, true);
-      return;
-    }
-    
-    wizardData.plugins[pluginId] = isChecked;
-    
-    // Update plugin item visual state
-    const pluginItem = $(this).closest('.plugin-item');
-    if (isChecked) {
-      pluginItem.addClass('selected');
-    } else {
-      pluginItem.removeClass('selected');
-      // Remove license key if plugin is disabled
-      if (wizardData.licenseKeys[pluginId]) {
-        delete wizardData.licenseKeys[pluginId];
-      }
-    }
-    
-    saveWizardData();
-    updateSummary();
-  });
-
-  // Sample data selection
-  $('input[name="sample-data"]').change(function () {
-    wizardData.sampleData = $(this).val();
-    saveWizardData();
-    updateSummary();
-  });
-}input", function() {
-    wizardData.storeInfo.name = $(this).val();
-    saveWizardData();
-    updateSummary();
   });
 
   // Theme selection
   $(document).on("click", ".theme-card", function () {
-    $(".theme-card:visible").removeClass("selected");
-    $(this).addClass("selected");
-    wizardData.theme = $(this).data("theme");
-    saveWizardData();
-    updateSummary();
+    const selectedTheme = $(this).data("theme");
+    selectTheme(selectedTheme);
   });
 
   // Plugin toggles
   $(document).on("change", ".plugin-checkbox", function () {
     const pluginId = $(this).attr("id");
     const isChecked = $(this).is(":checked");
-    wizardData.plugins[pluginId] = isChecked;
-    
-    // Update plugin item visual state
-    const pluginItem = $(this).closest('.plugin-item');
-    if (isChecked) {
-      pluginItem.addClass('selected');
+    const pluginNeedsLicense = checkIfPluginNeedsLicense(pluginId);
+
+    if (isChecked && pluginNeedsLicense && !wizardData.licenseKeys[pluginId]) {
+      // If plugin needs license and no key is present, open modal
+      const pluginName = getPluginName(pluginId);
+      openLicenseModal(pluginId, pluginName, true);
     } else {
-      pluginItem.removeClass('selected');
+      // Otherwise, just update the state
+      wizardData.plugins[pluginId] = isChecked;
+      const pluginItem = $(this).closest(".plugin-item");
+      if (isChecked) {
+        pluginItem.addClass("selected");
+      } else {
+        pluginItem.removeClass("selected");
+        // Remove license key if plugin is disabled
+        if (wizardData.licenseKeys[pluginId]) {
+          delete wizardData.licenseKeys[pluginId];
+        }
+      }
+      saveWizardData();
+      updateSummary();
     }
-    
-    saveWizardData();
-    updateSummary();
   });
 
   // Sample data selection
-  $('input[name="sample-data"]').change(function () {
+  $('input[name="sample-data"]').on("change", function () {
     wizardData.sampleData = $(this).val();
     saveWizardData();
     updateSummary();
+    updateNextButton(); // Added to update button if sample data selection affects validation
+  });
+
+  // Color pickers and text inputs for colors
+  $("#primaryColorPicker, #secondaryColorPicker, #tertiaryColorPicker").on(
+    "input",
+    function () {
+      updateColor($(this).attr("id").replace("ColorPicker", ""));
+    }
+  );
+  $("#primaryColorValue, #secondaryColorValue, #tertiaryColorValue").on(
+    "input",
+    function () {
+      updateColorFromText($(this).attr("id").replace("ColorValue", ""));
+    }
+  );
+
+  // Font selection
+  $("#useDefaultFont").on("change", function () {
+    toggleFontSelection();
+  });
+  $("#fontSearchInput").on("input", function () {
+    updateCustomFont();
+  });
+  $("#fontFamilySelect").on("change", function () {
+    updateFontFamily();
   });
 }
 
@@ -777,22 +448,23 @@ function selectPlatform(platform) {
 // Style tab functions
 function switchStyleTab(tabName) {
   // Update tab buttons
-  document.querySelectorAll('.style-tabs .tab-button').forEach(btn => {
-    btn.classList.remove('active');
+  document.querySelectorAll(".style-tabs .tab-button").forEach((btn) => {
+    btn.classList.remove("active");
   });
-  document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+  document.querySelector(`[data-tab="${tabName}"]`).classList.add("active");
 
   // Update tab content
-  document.querySelectorAll('.style-tabs .tab-panel').forEach(panel => {
-    panel.classList.remove('active');
+  document.querySelectorAll(".style-tabs .tab-panel").forEach((panel) => {
+    panel.classList.remove("active");
   });
-  document.querySelector(`.style-tabs .tab-panel[data-tab="${tabName}"]`).classList.add('active');
+  document
+    .querySelector(`.style-tabs .tab-panel[data-tab="${tabName}"]`)
+    .classList.add("active");
 }
 
 // Get selected theme
 function getSelectedTheme() {
-  const selectedRadio = document.querySelector('input[name="theme-selection"]:checked');
-  return selectedRadio ? selectedRadio.value : 'luma';
+  return wizardData.theme; // Rely on wizardData.theme as the source of truth
 }
 
 // Logo upload functions
@@ -812,70 +484,84 @@ function handleLogoUpload(input, type) {
 
   const reader = new FileReader();
   reader.onload = function (e) {
-    const previewId = type === 'desktop' ? 'desktopLogoPreview' : 'mobileLogoPreview';
-    const imageId = type === 'desktop' ? 'desktopLogoImage' : 'mobileLogoImage';
-    
+    const previewId =
+      type === "desktop" ? "desktopLogoPreview" : "mobileLogoPreview";
+    const imageId = type === "desktop" ? "desktopLogoImage" : "mobileLogoImage";
+
     const preview = document.getElementById(previewId);
     const image = document.getElementById(imageId);
-    
-    image.src = e.target.result;
-    preview.style.display = 'block';
 
-    // Save to wizard data
-    wizardData.styling = wizardData.styling || {};
-    wizardData.styling.logos = wizardData.styling.logos || {};
+    image.src = e.target.result;
+    preview.style.display = "block";
+
     wizardData.styling.logos[type] = e.target.result;
-    
     saveWizardData();
     updateSummary();
   };
   reader.readAsDataURL(file);
 }
 
-// Color functions
+// Color functions (consolidated)
 function updateColor(colorType) {
   const picker = document.getElementById(`${colorType}ColorPicker`);
   const value = document.getElementById(`${colorType}ColorValue`);
-  
+
   value.value = picker.value;
   saveColorToWizardData(colorType, picker.value);
+  updateColorGuide(); // Update color guide visually
 }
 
 function updateColorFromText(colorType) {
   const picker = document.getElementById(`${colorType}ColorPicker`);
   const value = document.getElementById(`${colorType}ColorValue`);
-  
+
   if (/^#[0-9A-F]{6}$/i.test(value.value)) {
     picker.value = value.value;
     saveColorToWizardData(colorType, value.value);
+    updateColorGuide(); // Update color guide visually
   }
 }
 
 function saveColorToWizardData(colorType, colorValue) {
-  wizardData.styling = wizardData.styling || {};
-  wizardData.styling.colors = wizardData.styling.colors || {};
   wizardData.styling.colors[colorType] = colorValue;
-  
   saveWizardData();
   updateSummary();
 }
 
+function updateColorGuide() {
+  // Update color guide swatches
+  const primaryColor = document.getElementById("primaryColorPicker").value;
+  const secondaryColor = document.getElementById("secondaryColorPicker").value;
+  const tertiaryColor = document.getElementById("tertiaryColorPicker").value;
+
+  if (document.querySelector(".primary-demo")) {
+    document.querySelector(".primary-demo").style.backgroundColor =
+      primaryColor;
+  }
+  if (document.querySelector(".secondary-demo")) {
+    document.querySelector(".secondary-demo").style.backgroundColor =
+      secondaryColor;
+  }
+  if (document.querySelector(".tertiary-demo")) {
+    document.querySelector(".tertiary-demo").style.backgroundColor =
+      tertiaryColor;
+  }
+}
+
 // Font functions
 function updateFontFamily() {
-  const fontSelect = document.getElementById('fontFamilySelect');
-  const previewText = document.getElementById('fontPreviewText');
-  
+  const fontSelect = document.getElementById("fontFamilySelect");
+  const previewText = document.getElementById("fontPreviewText");
+
   const selectedFont = fontSelect.value;
-  
-  if (selectedFont === 'default') {
-    previewText.style.fontFamily = 'Montserrat';
+
+  if (selectedFont === "default") {
+    previewText.style.fontFamily = "Montserrat";
   } else {
     previewText.style.fontFamily = selectedFont;
   }
-  
-  wizardData.styling = wizardData.styling || {};
+
   wizardData.styling.fonts = selectedFont;
-  
   saveWizardData();
   updateSummary();
 }
@@ -885,23 +571,42 @@ function updateThemeGrid() {
   if (wizardData.platform === "magento") {
     $(".default-themes").hide();
     $(".magento-themes").show();
-    
-    // Set default theme for Magento
-    if (!wizardData.theme) {
-      wizardData.theme = 'luma';
-      $('#luma-theme').prop('checked', true);
+
+    // Set default theme for Magento if none selected or if it's a non-magento default
+    if (
+      !wizardData.theme ||
+      wizardData.theme === "default" ||
+      wizardData.theme === "ecommerce"
+    ) {
+      selectTheme("luma");
     }
   } else {
     $(".default-themes").show();
     $(".magento-themes").hide();
-    
-    // Set default theme for other platforms
-    if (!wizardData.theme) {
-      wizardData.theme = 'default';
-      $('#default-theme').prop('checked', true);
+
+    // Set default theme for other platforms if none selected or if it's a magento theme
+    if (
+      !wizardData.theme ||
+      wizardData.theme === "luma" ||
+      wizardData.theme === "hyva"
+    ) {
+      selectTheme("default");
     }
   }
-  
+
+  // Update visual selection
+  setTimeout(() => {
+    document
+      .querySelectorAll(".theme-card")
+      .forEach((card) => card.classList.remove("selected"));
+    const selectedThemeCard = document.querySelector(
+      `[data-theme="${wizardData.theme}"]`
+    );
+    if (selectedThemeCard) {
+      selectedThemeCard.classList.add("selected");
+    }
+  }, 100); // Small delay to ensure elements are rendered before selecting
+
   saveWizardData();
   updateNextButton();
 }
@@ -925,7 +630,8 @@ function populateVersionSelect() {
 // Show dependencies
 function showDependencies() {
   if (wizardData.platform && wizardData.version) {
-    const dependencies = platformData[wizardData.platform].versions[wizardData.version];
+    const dependencies =
+      platformData[wizardData.platform].versions[wizardData.version];
     const container = $("#dependenciesList");
     container.empty();
 
@@ -953,7 +659,7 @@ function showDependencies() {
 // Helper functions for plugins
 function checkIfPluginNeedsLicense(pluginId) {
   for (const section of Object.values(pluginData)) {
-    const plugin = section.plugins.find(p => p.id === pluginId);
+    const plugin = section.plugins.find((p) => p.id === pluginId);
     if (plugin) {
       return plugin.needsLicense;
     }
@@ -963,7 +669,7 @@ function checkIfPluginNeedsLicense(pluginId) {
 
 function getPluginName(pluginId) {
   for (const section of Object.values(pluginData)) {
-    const plugin = section.plugins.find(p => p.id === pluginId);
+    const plugin = section.plugins.find((p) => p.id === pluginId);
     if (plugin) {
       return plugin.name;
     }
@@ -974,13 +680,18 @@ function getPluginName(pluginId) {
 // Theme selection functions
 function selectTheme(themeName) {
   wizardData.theme = themeName;
-  
+
   // Update visual state
-  document.querySelectorAll('.theme-item').forEach(item => {
-    item.classList.remove('selected');
+  document.querySelectorAll(".theme-card").forEach((item) => {
+    item.classList.remove("selected");
   });
-  document.querySelector(`[data-theme="${themeName}"]`).classList.add('selected');
-  
+  const selectedThemeCard = document.querySelector(
+    `[data-theme="${themeName}"]`
+  );
+  if (selectedThemeCard) {
+    selectedThemeCard.classList.add("selected");
+  }
+
   saveWizardData();
   updateSummary();
   updateNextButton();
@@ -989,85 +700,97 @@ function selectTheme(themeName) {
 // Sample data selection
 function selectSampleData(sampleType) {
   wizardData.sampleData = sampleType;
-  
+
   // Update visual state
-  document.querySelectorAll('.sample-item').forEach(item => {
-    item.classList.remove('selected');
+  document.querySelectorAll(".sample-item").forEach((item) => {
+    item.classList.remove("selected");
   });
-  document.querySelector(`[data-sample="${sampleType}"]`).classList.add('selected');
-  
+  const selectedSampleItem = document.querySelector(
+    `[data-sample="${sampleType}"]`
+  );
+  if (selectedSampleItem) {
+    selectedSampleItem.classList.add("selected");
+  }
+
   saveWizardData();
   updateSummary();
+  updateNextButton();
 }
 
 // Font functions
 function toggleFontSelection() {
-  const useDefault = document.getElementById('useDefaultFont').checked;
-  const customSelection = document.getElementById('customFontSelection');
-  
+  const useDefault = document.getElementById("useDefaultFont").checked;
+  const customSelection = document.getElementById("customFontSelection");
+
   if (useDefault) {
-    customSelection.style.display = 'none';
+    customSelection.style.display = "none";
     wizardData.styling.useDefaultFont = true;
-    wizardData.styling.fonts = 'default';
-    
+    wizardData.styling.fonts = "default";
+
     // Reset preview to default
-    document.getElementById('fontPreviewText').style.fontFamily = 'Montserrat';
+    document.getElementById("fontPreviewText").style.fontFamily = "Montserrat";
   } else {
-    customSelection.style.display = 'block';
+    customSelection.style.display = "block";
     wizardData.styling.useDefaultFont = false;
   }
-  
+
   saveWizardData();
   updateSummary();
 }
 
 function updateCustomFont() {
-  const fontInput = document.getElementById('fontSearchInput');
+  const fontInput = document.getElementById("fontSearchInput");
   const fontName = fontInput.value.trim();
-  
+
   if (fontName) {
     wizardData.styling.fonts = fontName;
-    document.getElementById('fontPreviewText').style.fontFamily = fontName;
-    saveWizardData();
-    updateSummary();
+    document.getElementById("fontPreviewText").style.fontFamily = fontName;
+  } else {
+    // If input is cleared, revert to 'default' font (Montserrat)
+    wizardData.styling.fonts = "default";
+    document.getElementById("fontPreviewText").style.fontFamily = "Montserrat";
   }
+  saveWizardData();
+  updateSummary();
 }
 
-// License modal functions (updated)
+// License modal functions
 function openLicenseModal(pluginId, pluginName, isRequired = false) {
   currentLicensePlugin = pluginId;
   $("#licenseModalTitle").text(`Enter License Key for ${pluginName}`);
-  $("#licenseKeyInput").val(wizardData.licenseKeys[pluginId] || '');
-  
+  $("#licenseKeyInput").val(wizardData.licenseKeys[pluginId] || "");
+
   if (isRequired) {
-    $("#licenseKeyInput").attr('required', true);
+    $("#licenseKeyInput").prop("required", true); // Use .prop() for boolean attributes
+  } else {
+    $("#licenseKeyInput").prop("required", false);
   }
-  
+
   $("#licenseModal").addClass("show");
   $("body").addClass("modal-open");
 }
 
 function closeLicenseModal() {
-  const isRequired = $("#licenseKeyInput").attr('required');
-  
+  const isRequired = $("#licenseKeyInput").prop("required"); // Use .prop()
+
   if (isRequired && currentLicensePlugin) {
     // If license is required and modal is closed without saving, uncheck the plugin
     const checkbox = $(`#${currentLicensePlugin}`);
-    checkbox.prop('checked', false);
-    checkbox.closest('.plugin-item').removeClass('selected');
+    checkbox.prop("checked", false);
+    checkbox.closest(".plugin-item").removeClass("selected");
     delete wizardData.plugins[currentLicensePlugin];
     saveWizardData();
   }
-  
+
   $("#licenseModal").removeClass("show");
   $("body").removeClass("modal-open");
   currentLicensePlugin = null;
-  $("#licenseKeyInput").removeAttr('required');
+  $("#licenseKeyInput").prop("required", false); // Reset required state
 }
 
 function saveLicenseKey() {
   const licenseKey = $("#licenseKeyInput").val().trim();
-  
+
   if (!licenseKey) {
     alert("Please enter a license key");
     return;
@@ -1076,12 +799,12 @@ function saveLicenseKey() {
   if (currentLicensePlugin) {
     wizardData.licenseKeys[currentLicensePlugin] = licenseKey;
     wizardData.plugins[currentLicensePlugin] = true;
-    
+
     // Update plugin visual state
     const checkbox = $(`#${currentLicensePlugin}`);
-    checkbox.prop('checked', true);
-    checkbox.closest('.plugin-item').addClass('selected');
-    
+    checkbox.prop("checked", true);
+    checkbox.closest(".plugin-item").addClass("selected");
+
     saveWizardData();
     updateSummary();
     closeLicenseModal();
@@ -1094,7 +817,9 @@ function openThemePreview(themeName) {
   const modalTitle = document.getElementById("modalThemeTitle");
   const desktopPreview = document.getElementById("desktopPreview");
   const mobilePreview = document.getElementById("mobilePreview");
-  const stylingTabBtn = document.querySelector('.theme-tab-btn[onclick*="styling"]');
+  const stylingTabBtn = document.querySelector(
+    '.theme-tab-btn[onclick*="styling"]'
+  );
 
   const themeData = themePreviewData[themeName];
   if (themeData) {
@@ -1110,26 +835,40 @@ function openThemePreview(themeName) {
 
 function closeThemePreview() {
   const modal = document.getElementById("themePreviewModal");
-  const stylingTabBtn = document.querySelector('.theme-tab-btn[onclick*="styling"]');
+  const stylingTabBtn = document.querySelector(
+    '.theme-tab-btn[onclick*="styling"]'
+  );
   const previewTab = document.getElementById("previewTab");
   const stylingTab = document.getElementById("stylingTab");
 
   modal.classList.remove("show");
   $("body").removeClass("modal-open");
 
-  document.querySelectorAll(".theme-tab-btn").forEach((btn) => btn.classList.remove("active"));
-  document.querySelector('.theme-tab-btn[onclick*="preview"]').classList.add("active");
+  document
+    .querySelectorAll(".theme-tab-btn")
+    .forEach((btn) => btn.classList.remove("active"));
+  document
+    .querySelector('.theme-tab-btn[onclick*="preview"]')
+    .classList.add("active");
   stylingTabBtn.style.display = "none";
 
   stylingTab.classList.remove("active");
   previewTab.classList.add("active");
 }
 
-function switchThemeTab(tabName) {
+function switchThemeTab(tabName, event) {
+  // Pass event object
   document.querySelectorAll(".theme-tab-btn").forEach((btn) => {
     btn.classList.remove("active");
   });
-  event.target.classList.add("active");
+  if (event && event.target) {
+    event.target.classList.add("active");
+  } else {
+    // Fallback if event is not passed (e.g., direct call)
+    document
+      .querySelector(`.theme-tab-btn[onclick*="${tabName}"]`)
+      .classList.add("active");
+  }
 
   document.querySelectorAll(".theme-tab-content").forEach((content) => {
     content.classList.remove("active");
@@ -1142,75 +881,6 @@ function switchThemeTab(tabName) {
   }
 }
 
-// Styling functions
-function handleLogoUpload(input) {
-  const file = input.files[0];
-  if (file) {
-    if (file.size > 2 * 1024 * 1024) {
-      alert("File size must be less than 2MB");
-      return;
-    }
-
-    if (!file.type.match(/^image\/(png|jpg|jpeg|svg\+xml)$/)) {
-      alert("Please upload a valid image file (PNG, JPG, SVG)");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const logoPreview = document.getElementById("logoPreview");
-      const logoImage = document.getElementById("logoImage");
-
-      logoImage.src = e.target.result;
-      logoPreview.style.display = "block";
-
-      wizardData.styling = wizardData.styling || {};
-      wizardData.styling.logo = e.target.result;
-      saveWizardData();
-      updateSummary();
-    };
-    reader.readAsDataURL(file);
-  }
-}
-
-function updateColorValue(pickerId, valueId) {
-  const picker = document.getElementById(pickerId);
-  const value = document.getElementById(valueId);
-  value.value = picker.value;
-  saveColorSettings();
-}
-
-function updateColorPicker(valueId, pickerId) {
-  const value = document.getElementById(valueId);
-  const picker = document.getElementById(pickerId);
-
-  if (/^#[0-9A-F]{6}$/i.test(value.value)) {
-    picker.value = value.value;
-    saveColorSettings();
-  }
-}
-
-function saveColorSettings() {
-  wizardData.styling = wizardData.styling || {};
-  wizardData.styling.colors = {
-    primary: document.getElementById("primaryColor").value,
-    secondary: document.getElementById("secondaryColor").value,
-    tertiary: document.getElementById("tertiaryColor").value,
-  };
-  saveWizardData();
-  updateSummary();
-}
-
-function updateFontPreview() {
-  const fontFamily = document.getElementById("fontFamily").value;
-  document.getElementById("fontPreview").style.fontFamily = fontFamily === 'default' ? 'Montserrat' : fontFamily;
-
-  wizardData.styling = wizardData.styling || {};
-  wizardData.styling.fonts = fontFamily;
-  saveWizardData();
-  updateSummary();
-}
-
 // Populate form fields from saved data
 function populateFormFields() {
   // Store info
@@ -1221,17 +891,24 @@ function populateFormFields() {
   // Platform selection
   if (wizardData.platform) {
     selectPlatform(wizardData.platform);
-    updateThemeGrid();
+    // updateThemeGrid() is called within selectPlatform
+  }
+
+  // Version selection (must be called after platform to populate options)
+  if (wizardData.platform && wizardData.version) {
+    populateVersionSelect(); // Ensure dropdown is populated
+    $("#versionSelect").val(wizardData.version);
+    showDependencies();
   }
 
   // Theme selection
   if (wizardData.theme) {
-    $(`input[name="theme-selection"][value="${wizardData.theme}"]`).prop('checked', true);
+    selectTheme(wizardData.theme); // This will also update the visual selection
   }
 
   // Sample data
   if (wizardData.sampleData) {
-    $(`input[name="sample-data"][value="${wizardData.sampleData}"]`).prop("checked", true);
+    selectSampleData(wizardData.sampleData); // This will also update the visual selection
   }
 
   // Colors
@@ -1245,65 +922,94 @@ function populateFormFields() {
       $("#secondaryColorPicker").val(colors.secondary);
       $("#secondaryColorValue").val(colors.secondary);
     }
+    if (colors.tertiary) {
+      $("#tertiaryColorPicker").val(colors.tertiary);
+      $("#tertiaryColorValue").val(colors.tertiary);
+    }
+    updateColorGuide(); // Call to update the visual swatches
   }
 
   // Fonts
-  if (wizardData.styling && wizardData.styling.fonts) {
-    $("#fontFamilySelect").val(wizardData.styling.fonts);
-    updateFontFamily();
+  if (wizardData.styling) {
+    $("#useDefaultFont").prop("checked", wizardData.styling.useDefaultFont);
+    toggleFontSelection(); // Call to show/hide custom font input
+    if (!wizardData.styling.useDefaultFont && wizardData.styling.fonts) {
+      $("#fontSearchInput").val(wizardData.styling.fonts);
+      updateCustomFont(); // Apply custom font if not using default
+    } else if (wizardData.styling.useDefaultFont) {
+      document.getElementById("fontPreviewText").style.fontFamily =
+        "Montserrat";
+    }
   }
 
   // Logos
   if (wizardData.styling && wizardData.styling.logos) {
     if (wizardData.styling.logos.desktop) {
-      $("#desktopLogoImage").attr('src', wizardData.styling.logos.desktop);
+      $("#desktopLogoImage").attr("src", wizardData.styling.logos.desktop);
       $("#desktopLogoPreview").show();
     }
     if (wizardData.styling.logos.mobile) {
-      $("#mobileLogoImage").attr('src', wizardData.styling.logos.mobile);
+      $("#mobileLogoImage").attr("src", wizardData.styling.logos.mobile);
       $("#mobileLogoPreview").show();
     }
   }
 
-  // Update plugin states after rendering
-  setTimeout(() => {
-    if (wizardData.plugins) {
-      Object.entries(wizardData.plugins).forEach(([pluginId, isEnabled]) => {
-        const checkbox = $(`#${pluginId}`);
-        if (checkbox.length) {
-          checkbox.prop("checked", isEnabled);
-          if (isEnabled) {
-            checkbox.closest('.plugin-item').addClass('selected');
-          }
-        }
-      });
-    }
-  }, 100);
+  // Update plugin states after rendering (already handled by renderPluginSections)
+  // No need for setTimeout here if renderPluginSections correctly initializes checkboxes based on wizardData
 }
 
 // Update summary
 function updateSummary() {
-  $("#summary-store-name").text(wizardData.storeInfo?.name || "a");
-  $("#summary-version").text(wizardData.version || "2_4_7");
-  $("#summary-selected-theme").text(wizardData.theme || "Luma");
-  
+  $("#summary-store-name").text(
+    wizardData.storeInfo?.name || "Your Store Name"
+  ); // Changed 'a' to a more descriptive default
+  $("#summary-version").text(wizardData.version || "N/A"); // Default version if not selected
+  $("#summary-selected-theme").text(
+    wizardData.theme
+      ? themePreviewData[wizardData.theme]?.name || wizardData.theme
+      : "Luma (Default)"
+  ); // More descriptive theme name
+
+  // Sample data summary
+  const sampleDataText =
+    wizardData.sampleData === "with_sample"
+      ? "Yes, using sample data"
+      : "No, using own data";
+  $("#summary-sample-data").text(sampleDataText);
+
   if (wizardData.styling) {
     // Logo summary
     if (wizardData.styling.logos) {
-      $("#summary-desktop-logo").text(wizardData.styling.logos.desktop ? "Desktop logo uploaded" : "No desktop logo uploaded");
-      $("#summary-mobile-logo").text(wizardData.styling.logos.mobile ? "Mobile logo uploaded" : "No mobile logo uploaded");
+      $("#summary-desktop-logo").text(
+        wizardData.styling.logos.desktop
+          ? "Desktop logo uploaded"
+          : "No desktop logo uploaded"
+      );
+      $("#summary-mobile-logo").text(
+        wizardData.styling.logos.mobile
+          ? "Mobile logo uploaded"
+          : "No mobile logo uploaded"
+      );
     }
-    
+
     // Color summary
     if (wizardData.styling.colors) {
-      $("#summary-primary-color").text(wizardData.styling.colors.primary || "#4e54c8");
-      $("#summary-secondary-color").text(wizardData.styling.colors.secondary || "#8f94fb");
-      $("#summary-tertiary-color").text(wizardData.styling.colors.tertiary || "#19b78a");
+      $("#summary-primary-color").text(
+        wizardData.styling.colors.primary || "#4e54c8"
+      );
+      $("#summary-secondary-color").text(
+        wizardData.styling.colors.secondary || "#8f94fb"
+      );
+      $("#summary-tertiary-color").text(
+        wizardData.styling.colors.tertiary || "#19b78a"
+      );
     }
-    
+
     // Font summary
-    if (wizardData.styling.fonts) {
-      $("#summary-fonts").text(wizardData.styling.fonts === 'default' ? 'Using Default Theme Font' : wizardData.styling.fonts);
+    if (wizardData.styling.useDefaultFont) {
+      $("#summary-fonts").text("Using Default Theme Font");
+    } else {
+      $("#summary-fonts").text(wizardData.styling.fonts || "Custom Font"); // Display actual custom font name
     }
   }
 }
@@ -1328,32 +1034,72 @@ function prevStep() {
 // Validate current step
 function validateCurrentStep() {
   let result = false;
-  
+
   switch (currentStep) {
     case 1:
-      // Step 1 should be valid if store name exists and not empty
+      // Step 1: Store Name must not be empty
       const storeName = wizardData.storeInfo?.name;
       result = storeName && storeName.trim().length > 0;
-      console.log('Step 1 validation - Store name:', storeName, 'Result:', result);
+      console.log(
+        "Step 1 validation - Store name:",
+        storeName,
+        "Result:",
+        result
+      );
       break;
     case 2:
+      // Step 2: Platform and Version must be selected
       result = wizardData.platform && wizardData.version;
-      console.log('Step 2 validation - Platform:', wizardData.platform, 'Version:', wizardData.version, 'Result:', result);
+      console.log(
+        "Step 2 validation - Platform:",
+        wizardData.platform,
+        "Version:",
+        wizardData.version,
+        "Result:",
+        result
+      );
       break;
     case 3:
-      result = wizardData.theme && wizardData.theme !== '';
-      console.log('Step 3 validation - Theme:', wizardData.theme, 'Result:', result);
+      // Step 3: Theme must be selected. Default theme ensures this is always true if a default is set.
+      result = wizardData.theme && wizardData.theme !== "";
+      console.log(
+        "Step 3 validation - Theme:",
+        wizardData.theme,
+        "Result:",
+        result
+      );
       break;
     case 4:
+      // Step 4: Plugins - ensure any required license keys are present for enabled plugins
+      let pluginsValid = true;
+      for (const pluginId in wizardData.plugins) {
+        if (
+          wizardData.plugins[pluginId] &&
+          checkIfPluginNeedsLicense(pluginId) &&
+          !wizardData.licenseKeys[pluginId]
+        ) {
+          pluginsValid = false;
+          break;
+        }
+      }
+      result = pluginsValid;
+      console.log("Step 4 validation - Plugins valid:", result);
+      break;
     case 5:
+      // Step 5: Sample Data - always valid as there's always a default
+      result = true;
+      console.log("Step 5 validation - Sample Data: true");
+      break;
     case 6:
-      result = true; // Plugin, sample data, and summary steps are always valid
+      // Step 6: Summary - always valid
+      result = true;
+      console.log("Step 6 validation - Summary: true");
       break;
     default:
       result = true;
       break;
   }
-  
+
   console.log(`Final validation result for step ${currentStep}:`, result);
   return result;
 }
@@ -1399,54 +1145,52 @@ function updateNavigation() {
     $("#nextBtn").html('Next Step <i class="fas fa-arrow-right"></i>');
   }
 
-  updateNextButton();
+  updateNextButton(); // Ensure next button state is correctly set after HTML change
 }
 
 // Update next button state
 function updateNextButton() {
   const isValid = validateCurrentStep();
   const nextBtn = $("#nextBtn");
-  
-  console.log('=== updateNextButton Debug ===');
-  console.log('Current Step:', currentStep);
-  console.log('Store Name:', wizardData.storeInfo?.name);
-  console.log('Is Valid:', isValid);
-  console.log('Button element found:', nextBtn.length > 0);
-  
+
+  console.log("=== updateNextButton Debug ===");
+  console.log("Current Step:", currentStep);
+  console.log("Store Name:", wizardData.storeInfo?.name);
+  console.log("Is Valid:", isValid);
+  console.log("Button element found:", nextBtn.length > 0);
+
   if (nextBtn.length === 0) {
-    console.error('Next button not found!');
+    console.error("Next button not found!");
     return;
   }
-  
-  // Remove disabled attribute and class
-  nextBtn.prop("disabled", false);
-  nextBtn.removeClass('disabled');
-  
+
   if (isValid) {
+    nextBtn.prop("disabled", false);
+    nextBtn.removeClass("disabled");
     nextBtn.css({
-      'opacity': '1',
-      'pointer-events': 'auto',
-      'cursor': 'pointer',
-      'background': '#ff7101'
+      opacity: "1",
+      "pointer-events": "auto",
+      cursor: "pointer",
+      background: "#ff7101",
     });
-    console.log('Button enabled');
+    console.log("Button enabled");
   } else {
     nextBtn.prop("disabled", true);
-    nextBtn.addClass('disabled');
+    nextBtn.addClass("disabled");
     nextBtn.css({
-      'opacity': '0.5',
-      'pointer-events': 'none',
-      'cursor': 'not-allowed',
-      'background': '#cccccc'
+      opacity: "0.5",
+      "pointer-events": "none",
+      cursor: "not-allowed",
+      background: "#cccccc",
     });
-    console.log('Button disabled');
+    console.log("Button disabled");
   }
-  
-  console.log('Button final state - disabled:', nextBtn.prop('disabled'));
-  console.log('=== End Debug ===');
+
+  console.log("Button final state - disabled:", nextBtn.prop("disabled"));
+  console.log("=== End Debug ===");
 }
 
-// Update display
+// Update display (main render function)
 function updateDisplay() {
   updateStepDisplay();
   updateProgressBar();
@@ -1454,23 +1198,35 @@ function updateDisplay() {
   updateSummary();
 }
 
-// Start installation
+// Start installation with modal
 function startInstallation() {
-  const steps = [
-    { selector: ".install-step:nth-child(1)", delay: 1000 },
-    { selector: ".install-step:nth-child(2)", delay: 3000 },
-    { selector: ".install-step:nth-child(3)", delay: 5000 },
-    { selector: ".install-step:nth-child(4)", delay: 7000 },
-  ];
+  $("#installationModal").addClass("show");
+  $("body").addClass("modal-open");
 
-  $("#nextBtn")
-    .prop("disabled", true)
-    .html('<i class="fas fa-spinner fa-spin"></i> Installing...');
+  const steps = [
+    {
+      id: "downloadStep",
+      delay: 1000,
+    },
+    {
+      id: "databaseStep",
+      delay: 3000,
+    },
+    {
+      id: "configStep",
+      delay: 5000,
+    },
+    {
+      id: "completeStep",
+      delay: 7000,
+    },
+  ];
 
   steps.forEach((step, index) => {
     setTimeout(() => {
+      // Complete previous step
       if (index > 0) {
-        const prevStep = $(steps[index - 1].selector);
+        const prevStep = $(`#${steps[index - 1].id}`);
         prevStep.removeClass("active").addClass("completed");
         prevStep
           .find(".install-status i")
@@ -1478,13 +1234,15 @@ function startInstallation() {
           .addClass("fa-check");
       }
 
-      const currentStepEl = $(step.selector);
+      // Activate current step
+      const currentStepEl = $(`#${step.id}`);
       currentStepEl.addClass("active");
       currentStepEl
         .find(".install-status i")
         .removeClass("fa-clock")
         .addClass("fa-spinner fa-spin");
 
+      // Complete last step and show completion
       if (index === steps.length - 1) {
         setTimeout(() => {
           currentStepEl.removeClass("active").addClass("completed");
@@ -1493,21 +1251,36 @@ function startInstallation() {
             .removeClass("fa-spinner fa-spin")
             .addClass("fa-check");
 
-          $("#nextBtn")
-            .prop("disabled", false)
-            .html('<i class="fas fa-external-link-alt"></i> Open Website');
-
-          showSuccessMessage();
+          // Hide installation steps and show completion
+          $(".installation-steps").hide();
+          $("#installationComplete").show();
+          showSuccessMessage(); // Call the unified success message
         }, 2000);
       }
     }, step.delay);
   });
 }
 
-// Show success message
+// View website function
+function viewWebsite() {
+  const storeName = wizardData.storeInfo?.name || "Your Website";
+  alert(`Opening ${storeName}...`);
+  // Here you would normally redirect to the actual website
+  // window.open('https://yourwebsite.com', '_blank');
+
+  // Reset wizard for demo
+  if (confirm("Would you like to create another website?")) {
+    resetWizard();
+  } else {
+    $("#installationModal").removeClass("show");
+    $("body").removeClass("modal-open");
+  }
+}
+
+// Show success message (unified function for both `startInstallation` and `closeSuccessMessage` logic)
 function showSuccessMessage() {
   const storeName = wizardData.storeInfo?.name || "Your Website";
-  const storeUrl = "yourwebsite.com";
+  const storeUrl = "yourwebsite.com"; // Placeholder
 
   const successHtml = `
     <div class="success-message" style="
@@ -1529,8 +1302,8 @@ function showSuccessMessage() {
             ${storeName} has been successfully installed and is ready to use.
         </p>
         <div style="margin-bottom: 3rem;">
-            <p><strong>Website URL:</strong> https://${storeUrl}</p>
-            <p><strong>Admin Panel:</strong> https://${storeUrl}/admin</p>
+            <p><strong>Website URL:</strong> <a href="https://${storeUrl}" target="_blank">https://${storeUrl}</a></p>
+            <p><strong>Admin Panel:</strong> <a href="https://${storeUrl}/admin" target="_blank">https://${storeUrl}/admin</a></p>
         </div>
         <button onclick="closeSuccessMessage()" class="button" style="margin-top: 0;">
             <i class="fas fa-times"></i> Close
@@ -1548,6 +1321,9 @@ function showSuccessMessage() {
   `;
 
   $("body").append(successHtml);
+  $("#nextBtn")
+    .prop("disabled", false)
+    .html('<i class="fas fa-external-link-alt"></i> Open Website'); // Re-enable button after installation
 }
 
 // Close success message
@@ -1556,6 +1332,10 @@ function closeSuccessMessage() {
 
   if (confirm("Would you like to create another website?")) {
     resetWizard();
+  } else {
+    // Optionally close the installation modal if not resetting
+    $("#installationModal").removeClass("show");
+    $("body").removeClass("modal-open");
   }
 }
 
@@ -1565,7 +1345,7 @@ function resetWizard() {
   location.reload();
 }
 
-// Form validation helpers
+// Form validation helpers (kept as is)
 function validateEmail(email) {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return re.test(email);
@@ -1576,7 +1356,9 @@ function validatePassword(password) {
 }
 
 function validateUrl(url) {
-  const re = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  // A more robust URL validation regex for domain names
+  const re =
+    /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/i;
   return re.test(url);
 }
 
@@ -1625,7 +1407,9 @@ function showFieldError(field, message) {
   let $error = $field.next(".field-error");
 
   if ($error.length === 0) {
-    $error = $('<div class="field-error" style="color: #ff7101; font-size: 1.4rem; margin-top: 0.5rem;"></div>');
+    $error = $(
+      '<div class="field-error" style="color: #ff7101; font-size: 1.4rem; margin-top: 0.5rem;"></div>'
+    );
     $field.after($error);
   }
 
@@ -1637,29 +1421,42 @@ function hideFieldError(field) {
   $(field).next(".field-error").remove();
 }
 
-// Add error styles
+// Add error styles (kept as is)
 $("<style>")
   .prop("type", "text/css")
-  .html(`
+  .html(
+    `
     .form-input.error,
     .form-textarea.error,
     .form-select.error {
         border-color: #ff7101 !important;
         box-shadow: 0 0 0 .3rem rgba(255, 113, 1, .2) !important;
     }
-`)
+`
+  )
   .appendTo("head");
 
 // Close modal when clicking outside
 document.addEventListener("click", function (event) {
   const themeModal = document.getElementById("themePreviewModal");
-  const licenseModal = document.getElementById("licenseModal");
-  
-  if (event.target === themeModal) {
+  const installationModal = document.getElementById("installationModal"); // Added for installation modal
+
+  if (themeModal && event.target === themeModal) {
     closeThemePreview();
   }
-  
-  // Don't close license modal on clicking overlay - let the onclick handler do it
+  // Allow installation modal to be closed by clicking outside only if not in the middle of installation animation
+  // The original code uses a general 'show' class which might need refinement if specific close behaviors are desired
+  if (
+    installationModal &&
+    event.target === installationModal &&
+    !$("#installationComplete").is(":visible")
+  ) {
+    // Only close if installation is not complete (i.e., not showing success message yet)
+    // The startInstallation function already handles hiding the modal once complete.
+    // For manual closing, this would be needed.
+    // But given the UX, the success message handles closing.
+    // So, this part might not be strictly necessary if the flow is well-controlled.
+  }
 });
 
 // Close modal with Escape key
@@ -1667,23 +1464,35 @@ document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") {
     closeThemePreview();
     closeLicenseModal();
+    // Potentially close installation modal, but depends on UX flow
+    if (
+      $("#installationModal").hasClass("show") &&
+      !$("#installationComplete").is(":visible")
+    ) {
+      // $("#installationModal").removeClass("show");
+      // $("body").removeClass("modal-open");
+    }
   }
 });
 
-// Make functions global for onclick handlers
+// Make functions global for onclick handlers (ensure all used functions are global)
 window.openThemePreview = openThemePreview;
 window.closeThemePreview = closeThemePreview;
 window.switchThemeTab = switchThemeTab;
 window.handleLogoUpload = handleLogoUpload;
-window.updateColorValue = updateColorValue;
-window.updateColorPicker = updateColorPicker;
-window.updateFontPreview = updateFontPreview;
+window.updateColor = updateColor; // Consolidated function
+window.updateColorFromText = updateColorFromText; // Consolidated function
+window.updateFontFamily = updateFontFamily; // Changed name for consistency
 window.closeSuccessMessage = closeSuccessMessage;
 window.openLicenseModal = openLicenseModal;
 window.closeLicenseModal = closeLicenseModal;
 window.saveLicenseKey = saveLicenseKey;
 window.switchStyleTab = switchStyleTab;
-window.getSelectedTheme = getSelectedTheme;
-window.updateColor = updateColor;
-window.updateColorFromText = updateColorFromText;
-window.updateFontFamily = updateFontFamily;
+window.getSelectedTheme = getSelectedTheme; // Returns wizardData.theme directly
+window.selectTheme = selectTheme;
+window.selectSampleData = selectSampleData;
+window.toggleFontSelection = toggleFontSelection;
+window.updateCustomFont = updateCustomFont;
+window.viewWebsite = viewWebsite;
+// Removed redundant updateColorValue and updateColorPicker from global as they are now consolidated into updateColor/updateColorFromText
+// Removed redundant saveColorSettings, updateFontPreview from global as their logic is handled in the consolidated functions.
