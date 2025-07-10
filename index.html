@@ -14,9 +14,6 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
 
-    <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/styles.css" />
   </head>
@@ -778,93 +775,6 @@
       <div class="modal-content">
         <div class="modal-header">
           <h2 class="modal-title">Installing Your Website</h2>
-        </div>
-        <div class="modal-body">
-          <div class="installation-steps">
-            <div class="install-step" id="downloadStep">
-              <div class="install-icon">
-                <i class="fas fa-download"></i>
-              </div>
-              <div class="install-text">
-                <h4>Downloading Platform</h4>
-                <p>Downloading and extracting files...</p>
-              </div>
-              <div class="install-status">
-                <i class="fas fa-clock"></i>
-              </div>
-            </div>
-            <div class="install-step" id="databaseStep">
-              <div class="install-icon">
-                <i class="fas fa-database"></i>
-              </div>
-              <div class="install-text">
-                <h4>Setting up Database</h4>
-                <p>Creating database structure...</p>
-              </div>
-              <div class="install-status">
-                <i class="fas fa-clock"></i>
-              </div>
-            </div>
-            <div class="install-step" id="configStep">
-              <div class="install-icon">
-                <i class="fas fa-cog"></i>
-              </div>
-              <div class="install-text">
-                <h4>Configuring Platform</h4>
-                <p>Applying configuration settings...</p>
-              </div>
-              <div class="install-status">
-                <i class="fas fa-clock"></i>
-              </div>
-            </div>
-            <div class="install-step" id="completeStep">
-              <div class="install-icon">
-                <i class="fas fa-check"></i>
-              </div>
-              <div class="install-text">
-                <h4>Installation Complete</h4>
-                <p>Your website is ready!</p>
-              </div>
-              <div class="install-status">
-                <i class="fas fa-clock"></i>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="installation-complete"
-            id="installationComplete"
-            style="display: none"
-          >
-            <div class="success-icon">
-              <i class="fas fa-check-circle"></i>
-            </div>
-            <h3>Installation Complete!</h3>
-            <p>
-              Your website has been successfully installed and is ready to use.
-            </p>
-            <div class="website-details">
-              <p><strong>Website URL:</strong> https://yourwebsite.com</p>
-              <p><strong>Admin Panel:</strong> https://yourwebsite.com/admin</p>
-            </div>
-            <button class="btn btn-primary" onclick="viewWebsite()">
-              <i class="fas fa-external-link-alt"></i>
-              View Your Website
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- License Key Modal -->
-    <div class="license-modal" id="licenseModal">
-      <div class="modal-overlay" onclick="closeLicenseModal()"></div>
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title" id="licenseModalTitle">Enter License Key</h2>
-          <button class="modal-close" onclick="closeLicenseModal()">
-            &times;
-          </button>
         </div>
         <div class="modal-body">
           <div class="form-group">
