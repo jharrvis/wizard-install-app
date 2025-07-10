@@ -1,5 +1,5 @@
 // Enhanced Website Creation Wizard JavaScript - 6 Steps
-// Vanilla JavaScript implementation
+// Vanilla JavaScript implementation - DEBUGGED VERSION
 
 // Global variables
 let currentStep = 1;
@@ -189,8 +189,9 @@ function $$(selector) {
 // Event delegation helper
 function delegate(parent, selector, event, handler) {
   parent.addEventListener(event, function (e) {
-    if (e.target.matches(selector) || e.target.closest(selector)) {
-      handler.call(e.target.closest(selector) || e.target, e);
+    const target = e.target.closest(selector);
+    if (target) {
+      handler.call(target, e);
     }
   });
 }
@@ -199,27 +200,76 @@ function delegate(parent, selector, event, handler) {
 document.addEventListener("DOMContentLoaded", function () {
   console.log("DOM Ready - Initializing wizard...");
 
+  // Debug: Check if elements exist
+  console.log("Step content elements found:", $$(".step-content").length);
+  console.log("Current step content:", $(`[data-step="${currentStep}"]`));
+
   // Set default values first
   wizardData.storeInfo = wizardData.storeInfo || {};
   wizardData.storeInfo.name = "Sample Store";
 
+  // Initialize in order
   loadPluginData();
   loadWizardData();
   initializeEventHandlers();
-  updateDisplay();
 
-  // Force populate store name field
-  const storeNameInput = $("#storeName");
-  if (storeNameInput) {
-    storeNameInput.value = wizardData.storeInfo.name;
-  }
+  // Force show first step
+  setTimeout(() => {
+    updateDisplay();
+
+    // Force populate store name field
+    const storeNameInput = $("#storeName");
+    if (storeNameInput) {
+      storeNameInput.value = wizardData.storeInfo.name;
+      console.log("Store name field populated:", storeNameInput.value);
+    } else {
+      console.error("Store name input not found!");
+    }
+
+    // Force show step 1 content
+    showStep(1);
+  }, 100);
 });
+
+// Force show specific step
+function showStep(stepNumber) {
+  console.log(`Forcing display of step ${stepNumber}`);
+
+  // Hide all step content
+  const stepContents = $$(".step-content");
+  stepContents.forEach((content) => {
+    content.classList.remove("active");
+    content.style.display = "none";
+  });
+
+  // Show current step content
+  const currentContent = $(`[data-step="${stepNumber}"]`);
+  if (currentContent) {
+    currentContent.classList.add("active");
+    currentContent.style.display = "block";
+    console.log(`Step ${stepNumber} content displayed`);
+  } else {
+    console.error(`Step ${stepNumber} content not found!`);
+  }
+
+  // Update sidebar steps
+  const stepItems = $$(".step-item");
+  stepItems.forEach((item, index) => {
+    item.classList.remove("active", "completed");
+    if (index + 1 === stepNumber) {
+      item.classList.add("active");
+    } else if (index + 1 < stepNumber) {
+      item.classList.add("completed");
+    }
+  });
+}
 
 // Load plugin data from JSON
 async function loadPluginData() {
   try {
     const response = await fetch("assets/data/plugins-data.json");
     pluginData = await response.json();
+    console.log("Plugin data loaded:", pluginData);
     renderPluginSections();
   } catch (error) {
     console.error("Error loading plugin data:", error);
@@ -245,14 +295,17 @@ async function loadPluginData() {
 
 // Initialize event handlers
 function initializeEventHandlers() {
+  console.log("Initializing event handlers...");
+
   const nextBtn = $("#nextBtn");
   const prevBtn = $("#prevBtn");
   const storeNameInput = $("#storeName");
 
   // Navigation buttons
   if (nextBtn) {
-    nextBtn.addEventListener("click", function () {
-      console.log("Next button clicked!");
+    nextBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      console.log("Next button clicked!", "Current step:", currentStep);
 
       if (this.disabled) {
         console.log("Button is disabled, not proceeding");
@@ -267,14 +320,21 @@ function initializeEventHandlers() {
         startInstallation();
       }
     });
+    console.log("Next button handler attached");
+  } else {
+    console.error("Next button not found!");
   }
 
   if (prevBtn) {
-    prevBtn.addEventListener("click", function () {
+    prevBtn.addEventListener("click", function (e) {
+      e.preventDefault();
       if (currentStep > 1) {
         prevStep();
       }
     });
+    console.log("Previous button handler attached");
+  } else {
+    console.error("Previous button not found!");
   }
 
   // Store name input
@@ -291,6 +351,9 @@ function initializeEventHandlers() {
         updateNextButton();
       });
     });
+    console.log("Store name input handler attached");
+  } else {
+    console.error("Store name input not found!");
   }
 
   // Version selection
@@ -298,6 +361,7 @@ function initializeEventHandlers() {
   if (versionSelect) {
     versionSelect.addEventListener("change", function () {
       const version = this.value;
+      console.log("Version selected:", version);
       wizardData.version = version;
       saveWizardData();
 
@@ -314,28 +378,32 @@ function initializeEventHandlers() {
     });
   }
 
-  // Platform selection
+  // Platform selection using event delegation
   delegate(document, ".platform-card", "click", function () {
     const platform = this.dataset.platform;
+    console.log("Platform selected:", platform);
     selectPlatform(platform);
   });
 
-  // Theme selection
+  // Theme selection using event delegation
   delegate(document, ".theme-clickable", "click", function () {
     const theme = this.dataset.theme;
+    console.log("Theme selected:", theme);
     selectTheme(theme);
   });
 
-  // Sample data selection
+  // Sample data selection using event delegation
   delegate(document, ".sample-clickable", "click", function () {
     const sampleType = this.dataset.sample;
+    console.log("Sample data selected:", sampleType);
     selectSampleData(sampleType);
   });
 
-  // Plugin toggles
+  // Plugin toggles using event delegation
   delegate(document, ".plugin-checkbox", "change", function () {
     const pluginId = this.id;
     const isChecked = this.checked;
+    console.log("Plugin toggled:", pluginId, isChecked);
 
     // Check if plugin needs license and is being enabled
     const pluginNeedsLicense = checkIfPluginNeedsLicense(pluginId);
@@ -365,47 +433,7 @@ function initializeEventHandlers() {
     updateSummary();
   });
 
-  // Color picker events
-  const colorPickers = [
-    "primaryColorPicker",
-    "secondaryColorPicker",
-    "tertiaryColorPicker",
-  ];
-  colorPickers.forEach((pickerId) => {
-    const picker = $("#" + pickerId);
-    if (picker) {
-      picker.addEventListener("change", function () {
-        const colorType = pickerId.replace("ColorPicker", "");
-        updateColor(colorType);
-      });
-    }
-  });
-
-  const colorValues = [
-    "primaryColorValue",
-    "secondaryColorValue",
-    "tertiaryColorValue",
-  ];
-  colorValues.forEach((valueId) => {
-    const value = $("#" + valueId);
-    if (value) {
-      value.addEventListener("change", function () {
-        const colorType = valueId.replace("ColorValue", "");
-        updateColorFromText(colorType);
-      });
-    }
-  });
-
-  // Font selection
-  const useDefaultFont = $("#useDefaultFont");
-  if (useDefaultFont) {
-    useDefaultFont.addEventListener("change", toggleFontSelection);
-  }
-
-  const fontSearchInput = $("#fontSearchInput");
-  if (fontSearchInput) {
-    fontSearchInput.addEventListener("change", updateCustomFont);
-  }
+  console.log("All event handlers initialized");
 }
 
 // Navigation functions
@@ -417,7 +445,7 @@ function nextStep() {
   if (isValid) {
     currentStep++;
     console.log("Advancing to step:", currentStep);
-    updateStepDisplay();
+    showStep(currentStep);
     updateProgressBar();
     updateNavigation();
   } else {
@@ -427,7 +455,8 @@ function nextStep() {
 
 function prevStep() {
   currentStep--;
-  updateStepDisplay();
+  console.log("Going back to step:", currentStep);
+  showStep(currentStep);
   updateProgressBar();
   updateNavigation();
 }
@@ -480,30 +509,6 @@ function validateCurrentStep() {
 
   console.log(`Final validation result for step ${currentStep}:`, result);
   return result;
-}
-
-// Update step display
-function updateStepDisplay() {
-  // Hide all step content
-  const stepContents = $$(".step-content");
-  stepContents.forEach((content) => content.classList.remove("active"));
-
-  // Show current step content
-  const currentContent = $(`[data-step="${currentStep}"]`);
-  if (currentContent) {
-    currentContent.classList.add("active");
-  }
-
-  // Update sidebar steps
-  const stepItems = $$(".step-item");
-  stepItems.forEach((item, index) => {
-    item.classList.remove("active", "completed");
-    if (index + 1 === currentStep) {
-      item.classList.add("active");
-    } else if (index + 1 < currentStep) {
-      item.classList.add("completed");
-    }
-  });
 }
 
 // Update progress bar
@@ -592,7 +597,8 @@ function updateNextButton() {
 
 // Update display
 function updateDisplay() {
-  updateStepDisplay();
+  console.log("Updating display for step:", currentStep);
+  showStep(currentStep);
   updateProgressBar();
   updateNavigation();
   updateSummary();
@@ -715,6 +721,8 @@ function updateSummary() {
 
 // Platform selection
 function selectPlatform(platform) {
+  console.log("Selecting platform:", platform);
+
   // Remove selected class from all platform cards
   $$(".platform-card").forEach((card) => card.classList.remove("selected"));
 
@@ -739,6 +747,7 @@ function selectPlatform(platform) {
 
 // Theme selection functions
 function selectTheme(themeName) {
+  console.log("Selecting theme:", themeName);
   wizardData.theme = themeName;
 
   // Update visual state
@@ -756,6 +765,7 @@ function selectTheme(themeName) {
 
 // Sample data selection
 function selectSampleData(sampleType) {
+  console.log("Selecting sample data:", sampleType);
   wizardData.sampleData = sampleType;
 
   // Update visual state
@@ -772,11 +782,14 @@ function selectSampleData(sampleType) {
 
 // Helper functions
 function populateFormFields() {
+  console.log("Populating form fields...");
+
   // Store info
   if (wizardData.storeInfo) {
     const storeNameInput = $("#storeName");
     if (storeNameInput) {
       storeNameInput.value = wizardData.storeInfo.name || "Sample Store";
+      console.log("Store name populated:", storeNameInput.value);
     }
   }
 
@@ -794,33 +807,6 @@ function populateFormFields() {
   // Sample data
   if (wizardData.sampleData) {
     selectSampleData(wizardData.sampleData);
-  }
-
-  // Colors
-  if (wizardData.styling && wizardData.styling.colors) {
-    const colors = wizardData.styling.colors;
-
-    const primaryColorPicker = $("#primaryColorPicker");
-    const primaryColorValue = $("#primaryColorValue");
-    const secondaryColorPicker = $("#secondaryColorPicker");
-    const secondaryColorValue = $("#secondaryColorValue");
-    const tertiaryColorPicker = $("#tertiaryColorPicker");
-    const tertiaryColorValue = $("#tertiaryColorValue");
-
-    if (colors.primary) {
-      if (primaryColorPicker) primaryColorPicker.value = colors.primary;
-      if (primaryColorValue) primaryColorValue.value = colors.primary;
-    }
-    if (colors.secondary) {
-      if (secondaryColorPicker) secondaryColorPicker.value = colors.secondary;
-      if (secondaryColorValue) secondaryColorValue.value = colors.secondary;
-    }
-    if (colors.tertiary) {
-      if (tertiaryColorPicker) tertiaryColorPicker.value = colors.tertiary;
-      if (tertiaryColorValue) tertiaryColorValue.value = colors.tertiary;
-    }
-
-    updateColorGuide();
   }
 
   // Update plugin states after rendering
@@ -847,7 +833,10 @@ function populateFormFields() {
 
 function populateVersionSelect() {
   const select = $("#versionSelect");
-  if (!select) return;
+  if (!select) {
+    console.error("Version select not found!");
+    return;
+  }
 
   select.innerHTML = '<option value="">Choose version...</option>';
 
@@ -862,6 +851,7 @@ function populateVersionSelect() {
       }
       select.appendChild(option);
     });
+    console.log("Version select populated with", versions.length, "versions");
   }
 }
 
@@ -907,7 +897,10 @@ function updateThemeGrid() {
 
 function renderPluginSections() {
   const container = $("#pluginSections");
-  if (!container) return;
+  if (!container) {
+    console.error("Plugin sections container not found!");
+    return;
+  }
 
   container.innerHTML = "";
 
@@ -953,6 +946,8 @@ function renderPluginSections() {
 
     container.appendChild(sectionDiv);
   });
+
+  console.log("Plugin sections rendered");
 }
 
 function checkIfPluginNeedsLicense(pluginId) {
@@ -1147,6 +1142,8 @@ function handleLogoUpload(input, type) {
 
 // Style tab functions
 function switchStyleTab(tabName) {
+  console.log("Switching to style tab:", tabName);
+
   // Update tab buttons
   const tabButtons = $(".style-tabs .tab-button");
   tabButtons.forEach((btn) => btn.classList.remove("active"));
