@@ -303,29 +303,45 @@ function updateNavigation() {
   updateNextButton();
 }
 
-// Emergency fallback to ensure button works
-setTimeout(() => {
-  console.log("=== EMERGENCY FALLBACK ===");
+// Update next button state
+function updateNextButton() {
+  const isValid = validateCurrentStep();
   const nextBtn = $("#nextBtn");
 
-  if (nextBtn.length > 0) {
-    // Force enable button for step 1
+  console.log("=== updateNextButton Debug ===");
+  console.log("Current Step:", currentStep);
+  console.log("Store Name:", wizardData.storeInfo?.name);
+  console.log("Is Valid:", isValid);
+  console.log("Button element found:", nextBtn.length > 0);
+
+  if (nextBtn.length === 0) {
+    console.error("Next button not found!");
+    return;
+  }
+
+  if (isValid) {
     nextBtn.prop("disabled", false);
     nextBtn.removeClass("disabled");
     nextBtn.css({
       opacity: "1",
       "pointer-events": "auto",
-      cursor: "pointer",
-      background: "#ff7101",
+      cursor: "pointer"
     });
-
-    console.log("Emergency fallback: Button force enabled");
-    console.log("Button disabled property:", nextBtn.prop("disabled"));
-    console.log("Button classes:", nextBtn.attr("class"));
+    console.log("Button enabled");
   } else {
-    console.error("Emergency fallback: Button not found");
+    nextBtn.prop("disabled", true);
+    nextBtn.addClass("disabled");
+    nextBtn.css({
+      opacity: "0.5",
+      "pointer-events": "none",
+      cursor: "not-allowed"
+    });
+    console.log("Button disabled");
   }
-}, 1000);
+
+  console.log("Button final state - disabled:", nextBtn.prop("disabled"));
+  console.log("=== End Debug ===");
+}
 
 // Make functions global for onclick handlers
 window.openThemePreview = openThemePreview;
@@ -348,7 +364,10 @@ window.selectTheme = selectTheme;
 window.selectSampleData = selectSampleData;
 window.toggleFontSelection = toggleFontSelection;
 window.updateCustomFont = updateCustomFont;
-window.viewWebsite = viewWebsite; // Enhanced Website Creation Wizard JavaScript - 6 Steps
+window.viewWebsite = viewWebsite; // Test if script is loading
+console.log("Script.js is loading...");
+
+// Enhanced Website Creation Wizard JavaScript - 6 Steps
 
 // Update placeholders
 const themePreviewData = {
@@ -539,18 +558,21 @@ $(document).ready(function () {
   // Force populate store name field
   $("#storeName").val(wizardData.storeInfo.name);
 
-  // Multiple attempts to ensure button is enabled
-  updateNextButton();
-
+  // Force enable button for step 1 since we have a valid store name
+  console.log("Forcing button enable on page load");
+  const nextBtn = $("#nextBtn");
+  nextBtn.prop("disabled", false);
+  nextBtn.removeClass("disabled");
+  nextBtn.css({
+    opacity: "1",
+    "pointer-events": "auto",
+    cursor: "pointer"
+  });
+  
+  // Ensure button state is correct after initialization
   setTimeout(() => {
-    console.log("Second attempt to update button...");
     updateNextButton();
   }, 100);
-
-  setTimeout(() => {
-    console.log("Third attempt to update button...");
-    updateNextButton();
-  }, 500);
 });
 
 // Load plugin data from JSON
@@ -672,13 +694,13 @@ function saveWizardData() {
 // Initialize event handlers
 function initializeEventHandlers() {
   // Platform selection
-  $(".platform-card").click(function () {
+  $(".platform-card").off("click").on("click", function () {
     const platform = $(this).data("platform");
     selectPlatform(platform);
   });
 
   // Version selection
-  $("#versionSelect").change(function () {
+  $("#versionSelect").off("change").on("change", function () {
     const version = $(this).val();
     wizardData.version = version;
     saveWizardData();
@@ -693,22 +715,31 @@ function initializeEventHandlers() {
   });
 
   // Navigation buttons
-  $("#nextBtn").click(function () {
+  $("#nextBtn").off("click").on("click", function () {
+    console.log("Next button clicked!");
+    
+    if ($(this).prop("disabled")) {
+      console.log("Button is disabled, not proceeding");
+      return false;
+    }
+    
     if (currentStep < 6) {
+      console.log("Calling nextStep()");
       nextStep();
     } else {
+      console.log("Starting installation");
       startInstallation();
     }
   });
 
-  $("#prevBtn").click(function () {
+  $("#prevBtn").off("click").on("click", function () {
     if (currentStep > 1) {
       prevStep();
     }
   });
 
-  // Form inputs
-  $("#storeName").on("input keyup change blur", function () {
+  // Form inputs - single handler for store name
+  $("#storeName").off("input change blur").on("input change blur", function () {
     const storeName = $(this).val().trim();
     console.log("Store name input changed to:", storeName);
 
@@ -721,17 +752,14 @@ function initializeEventHandlers() {
     updateNextButton();
   });
 
-  // Theme selection (radio buttons)
-  $(document).on("change", 'input[name="theme-selection"]', function () {
-    const selectedTheme = $(this).val();
-    wizardData.theme = selectedTheme;
-    saveWizardData();
-    updateSummary();
-    updateNextButton();
+  // Theme selection handlers
+  $(document).off("click", ".theme-clickable").on("click", ".theme-clickable", function () {
+    const theme = $(this).data("theme");
+    selectTheme(theme);
   });
 
   // Plugin toggles
-  $(document).on("change", ".plugin-checkbox", function () {
+  $(document).off("change", ".plugin-checkbox").on("change", ".plugin-checkbox", function () {
     const pluginId = $(this).attr("id");
     const isChecked = $(this).is(":checked");
 
@@ -763,54 +791,14 @@ function initializeEventHandlers() {
     updateSummary();
   });
 
-  // Sample data selection
-  $('input[name="sample-data"]').change(function () {
-    wizardData.sampleData = $(this).val();
-    saveWizardData();
-    updateSummary();
+  // Sample data selection handlers
+  $(document).off("click", ".sample-clickable").on("click", ".sample-clickable", function () {
+    const sampleType = $(this).data("sample");
+    selectSampleData(sampleType);
   });
 }
 
-// input", function() {
-//     wizardData.storeInfo.name = $(this).val();
-//     saveWizardData();
-//     updateSummary();
-//   });
-
-// Theme selection
-$(document).on("click", ".theme-card", function () {
-  $(".theme-card:visible").removeClass("selected");
-  $(this).addClass("selected");
-  wizardData.theme = $(this).data("theme");
-  saveWizardData();
-  updateSummary();
-});
-
-// Plugin toggles
-$(document).on("change", ".plugin-checkbox", function () {
-  const pluginId = $(this).attr("id");
-  const isChecked = $(this).is(":checked");
-  wizardData.plugins[pluginId] = isChecked;
-
-  // Update plugin item visual state
-  const pluginItem = $(this).closest(".plugin-item");
-  if (isChecked) {
-    pluginItem.addClass("selected");
-  } else {
-    pluginItem.removeClass("selected");
-  }
-
-  saveWizardData();
-  updateSummary();
-});
-
-// Sample data selection
-$('input[name="sample-data"]').change(function () {
-  wizardData.sampleData = $(this).val();
-  saveWizardData();
-  updateSummary();
-});
-// }
+// Duplicate event handlers removed - using consolidated handlers in initializeEventHandlers()
 
 // Platform selection
 function selectPlatform(platform) {
@@ -1405,11 +1393,18 @@ function updateSummary() {
 
 // Navigation functions
 function nextStep() {
-  if (validateCurrentStep()) {
+  console.log("nextStep called, current step:", currentStep);
+  const isValid = validateCurrentStep();
+  console.log("Step validation result:", isValid);
+  
+  if (isValid) {
     currentStep++;
+    console.log("Advancing to step:", currentStep);
     updateStepDisplay();
     updateProgressBar();
     updateNavigation();
+  } else {
+    console.log("Validation failed, not advancing");
   }
 }
 
@@ -1514,49 +1509,7 @@ function updateNavigation() {
   updateNextButton();
 }
 
-// Update next button state
-function updateNextButton() {
-  const isValid = validateCurrentStep();
-  const nextBtn = $("#nextBtn");
-
-  console.log("=== updateNextButton Debug ===");
-  console.log("Current Step:", currentStep);
-  console.log("Store Name:", wizardData.storeInfo?.name);
-  console.log("Is Valid:", isValid);
-  console.log("Button element found:", nextBtn.length > 0);
-
-  if (nextBtn.length === 0) {
-    console.error("Next button not found!");
-    return;
-  }
-
-  // Remove disabled attribute and class
-  nextBtn.prop("disabled", false);
-  nextBtn.removeClass("disabled");
-
-  if (isValid) {
-    nextBtn.css({
-      opacity: "1",
-      "pointer-events": "auto",
-      cursor: "pointer",
-      background: "#ff7101",
-    });
-    console.log("Button enabled");
-  } else {
-    nextBtn.prop("disabled", true);
-    nextBtn.addClass("disabled");
-    nextBtn.css({
-      opacity: "0.5",
-      "pointer-events": "none",
-      cursor: "not-allowed",
-      background: "#cccccc",
-    });
-    console.log("Button disabled");
-  }
-
-  console.log("Button final state - disabled:", nextBtn.prop("disabled"));
-  console.log("=== End Debug ===");
-}
+// Duplicate updateNextButton function removed - using the one defined earlier
 
 // Update display
 function updateDisplay() {

@@ -765,7 +765,7 @@
           <div class="nav-info">
             <span class="current-step">Step 1 of 6</span>
           </div>
-          <button class="btn btn-primary" id="nextBtn" disabled>
+          <button class="btn btn-primary" id="nextBtn">
             Next Step
             <i class="fas fa-arrow-right"></i>
           </button>
@@ -1078,5 +1078,113 @@
 
     <!-- Custom JavaScript -->
     <script src="assets/js/script.js"></script>
+    
+    <!-- Debug Script -->
+    <script>
+      console.log("Inline script loaded");
+      console.log("jQuery loaded:", typeof $ !== 'undefined');
+      
+      // Vanilla JavaScript implementation since jQuery is blocked
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM Content Loaded");
+        
+        let currentStep = 1;
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        
+        if (nextBtn) {
+          console.log("Next button found");
+          nextBtn.disabled = false;
+          nextBtn.style.opacity = '1';
+          
+          nextBtn.addEventListener('click', function() {
+            console.log("Next button clicked, current step:", currentStep);
+            
+            if (currentStep < 6) {
+              currentStep++;
+              console.log("Advancing to step:", currentStep);
+              updateStepDisplay(currentStep);
+              updateProgressBar(currentStep);
+              updateNavigation(currentStep);
+            }
+          });
+        }
+        
+        if (prevBtn) {
+          prevBtn.addEventListener('click', function() {
+            if (currentStep > 1) {
+              currentStep--;
+              updateStepDisplay(currentStep);
+              updateProgressBar(currentStep);
+              updateNavigation(currentStep);
+            }
+          });
+        }
+        
+        function updateStepDisplay(step) {
+          // Hide all step content
+          const stepContents = document.querySelectorAll('.step-content');
+          stepContents.forEach(content => content.classList.remove('active'));
+          
+          // Show current step content
+          const currentContent = document.querySelector(`[data-step="${step}"]`);
+          if (currentContent) {
+            currentContent.classList.add('active');
+          }
+          
+          // Update sidebar steps
+          const stepItems = document.querySelectorAll('.step-item');
+          stepItems.forEach((item, index) => {
+            item.classList.remove('active', 'completed');
+            if (index + 1 === step) {
+              item.classList.add('active');
+            } else if (index + 1 < step) {
+              item.classList.add('completed');
+            }
+          });
+        }
+        
+        function updateProgressBar(step) {
+          const progress = (step / 6) * 100;
+          const progressFill = document.querySelector('.progress-fill');
+          if (progressFill) {
+            progressFill.style.width = progress + '%';
+          }
+          
+          const stepTexts = {
+            1: "Step 1 of 6 - Store Info",
+            2: "Step 2 of 6 - Platform",
+            3: "Step 3 of 6 - Styles",
+            4: "Step 4 of 6 - Plugin Settings",
+            5: "Step 5 of 6 - Sample Data",
+            6: "Step 6 of 6 - Summary",
+          };
+          
+          const progressText = document.querySelector('.progress-text');
+          if (progressText) {
+            progressText.textContent = stepTexts[step];
+          }
+          
+          const currentStepSpan = document.querySelector('.current-step');
+          if (currentStepSpan) {
+            currentStepSpan.textContent = `Step ${step} of 6`;
+          }
+        }
+        
+        function updateNavigation(step) {
+          if (prevBtn) {
+            prevBtn.disabled = step === 1;
+          }
+          
+          if (nextBtn) {
+            if (step === 6) {
+              nextBtn.innerHTML = '<i class="fas fa-rocket"></i> Start Installation';
+            } else {
+              nextBtn.innerHTML = 'Next Step <i class="fas fa-arrow-right"></i>';
+            }
+          }
+        }
+      });
+    </script>
   </body>
 </html>
