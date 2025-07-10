@@ -237,6 +237,11 @@ function renderPluginSections() {
   const container = $("#pluginSections");
   container.empty();
 
+  if (!pluginData || typeof pluginData !== "object") {
+    console.error("Invalid plugin data:", pluginData);
+    return;
+  }
+
   Object.entries(pluginData).forEach(([sectionKey, section]) => {
     const sectionHtml = `
       <div class="plugin-section">
