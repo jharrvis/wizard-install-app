@@ -514,8 +514,17 @@ function initializeEventHandlers() {
   });
 
   // Theme selection
-  $(document).on("click", ".theme-card", function () {
-    const selectedTheme = $(this).data("theme");
+  $(document).on("click", ".theme-card", function (e) {
+    // Prevent double triggering from label click
+    e.stopPropagation();
+    const themeItem = $(this).closest(".theme-item");
+    const selectedTheme = themeItem.data("theme");
+    const radioInput = themeItem.find('input[name="theme-selection"]');
+
+    if (radioInput.length > 0) {
+      radioInput.prop("checked", true);
+    }
+
     selectTheme(selectedTheme);
   });
 
@@ -532,6 +541,7 @@ function initializeEventHandlers() {
 
     if (isChecked && pluginNeedsLicense && !wizardData.licenseKeys[pluginId]) {
       const pluginName = getPluginName(pluginId);
+      currentLicensePlugin = pluginId;
       openLicenseModal(pluginId, pluginName, true);
     } else {
       wizardData.plugins[pluginId] = isChecked;
@@ -585,9 +595,6 @@ function initializeEventHandlers() {
     updateFontFamily();
   });
 }
-
-// The rest of your functions remain the same...
-// (Include all other functions from your original script.js here)
 
 // Platform selection
 function selectPlatform(platform) {
@@ -663,9 +670,6 @@ function handleLogoUpload(input, type) {
   };
   reader.readAsDataURL(file);
 }
-
-// Include all other functions from your original script unchanged...
-// (Color functions, Theme functions, Font functions, Navigation functions, etc.)
 
 // Color functions (consolidated)
 function updateColor(colorType) {
@@ -757,15 +761,23 @@ function updateThemeGrid() {
     }
   }
 
+  // Update radio buttons to match selected theme
   setTimeout(() => {
-    document
-      .querySelectorAll(".theme-card")
-      .forEach((card) => card.classList.remove("selected"));
-    const selectedThemeCard = document.querySelector(
-      `[data-theme="${wizardData.theme}"]`
+    const radioInput = document.querySelector(
+      `input[name="theme-selection"][value="${wizardData.theme}"]`
     );
-    if (selectedThemeCard) {
-      selectedThemeCard.classList.add("selected");
+    if (radioInput) {
+      radioInput.checked = true;
+    }
+
+    document.querySelectorAll(".theme-item").forEach((item) => {
+      item.classList.remove("selected");
+    });
+    const selectedThemeItem = document.querySelector(
+      `.theme-item[data-theme="${wizardData.theme}"]`
+    );
+    if (selectedThemeItem) {
+      selectedThemeItem.classList.add("selected");
     }
   }, 100);
 
@@ -822,14 +834,22 @@ function showDependencies() {
 function selectTheme(themeName) {
   wizardData.theme = themeName;
 
-  document.querySelectorAll(".theme-card").forEach((item) => {
+  // Update radio buttons
+  document
+    .querySelectorAll('input[name="theme-selection"]')
+    .forEach((radio) => {
+      radio.checked = radio.value === themeName;
+    });
+
+  // Update visual indicators
+  document.querySelectorAll(".theme-item").forEach((item) => {
     item.classList.remove("selected");
   });
-  const selectedThemeCard = document.querySelector(
-    `[data-theme="${themeName}"]`
+  const selectedThemeItem = document.querySelector(
+    `.theme-item[data-theme="${themeName}"]`
   );
-  if (selectedThemeCard) {
-    selectedThemeCard.classList.add("selected");
+  if (selectedThemeItem) {
+    selectedThemeItem.classList.add("selected");
   }
 
   saveWizardData();
@@ -910,11 +930,13 @@ function closeLicenseModal() {
   const isRequired = $("#licenseKeyInput").prop("required");
 
   if (isRequired && currentLicensePlugin) {
+    // If user cancels, uncheck the plugin
     const checkbox = $(`#${currentLicensePlugin}`);
     checkbox.prop("checked", false);
     checkbox.closest(".plugin-item").removeClass("selected");
     delete wizardData.plugins[currentLicensePlugin];
     saveWizardData();
+    updateSummary();
   }
 
   $("#licenseModal").removeClass("show");
@@ -932,16 +954,23 @@ function saveLicenseKey() {
   }
 
   if (currentLicensePlugin) {
+    // Save the license key
     wizardData.licenseKeys[currentLicensePlugin] = licenseKey;
     wizardData.plugins[currentLicensePlugin] = true;
 
+    // Keep the checkbox checked and plugin selected
     const checkbox = $(`#${currentLicensePlugin}`);
     checkbox.prop("checked", true);
     checkbox.closest(".plugin-item").addClass("selected");
 
     saveWizardData();
     updateSummary();
-    closeLicenseModal();
+
+    // Close modal without unchecking
+    $("#licenseModal").removeClass("show");
+    $("body").removeClass("modal-open");
+    currentLicensePlugin = null;
+    $("#licenseKeyInput").prop("required", false);
   }
 }
 
@@ -1035,6 +1064,13 @@ function populateFormFields() {
   // Theme selection
   if (wizardData.theme) {
     selectTheme(wizardData.theme);
+    // Ensure radio button is checked
+    const themeRadio = document.querySelector(
+      `input[name="theme-selection"][value="${wizardData.theme}"]`
+    );
+    if (themeRadio) {
+      themeRadio.checked = true;
+    }
   }
 
   // Sample data
@@ -1104,6 +1140,25 @@ function updateSummary() {
       ? "Yes, using sample data"
       : "No, using own data";
   $("#summary-sample-data").text(sampleDataText);
+
+  // Plugins summary
+  const pluginsList = $("#summary-plugins");
+  pluginsList.empty();
+
+  const activePlugins = Object.keys(wizardData.plugins).filter(
+    (pluginId) => wizardData.plugins[pluginId]
+  );
+
+  if (activePlugins.length > 0) {
+    activePlugins.forEach((pluginId) => {
+      const pluginName = getPluginName(pluginId);
+      const hasLicense = wizardData.licenseKeys[pluginId];
+      const licenseText = hasLicense ? " (Licensed)" : "";
+      pluginsList.append(`<li>${pluginName}${licenseText}</li>`);
+    });
+  } else {
+    pluginsList.append("<li>No plugins selected</li>");
+  }
 
   if (wizardData.styling) {
     // Logo summary
@@ -1322,6 +1377,31 @@ function updateDisplay() {
 
 // Start installation with modal
 function startInstallation() {
+  // Save final configuration data
+  const finalConfig = {
+    timestamp: new Date().toISOString(),
+    configuration: wizardData,
+    platform: {
+      name: wizardData.platform,
+      version: wizardData.version,
+      dependencies:
+        platformData[wizardData.platform]?.versions[wizardData.version] || {},
+    },
+    activePlugins: Object.keys(wizardData.plugins)
+      .filter((id) => wizardData.plugins[id])
+      .map((id) => ({
+        id: id,
+        name: getPluginName(id),
+        hasLicense: !!wizardData.licenseKeys[id],
+        licenseKey: wizardData.licenseKeys[id] || null,
+      })),
+  };
+
+  // Save to localStorage and potentially send to server
+  localStorage.setItem("finalInstallationConfig", JSON.stringify(finalConfig));
+  console.log("Final Installation Configuration:", finalConfig);
+
+  // Show installation modal
   $("#installationModal").addClass("show");
   $("body").addClass("modal-open");
 
@@ -1370,6 +1450,19 @@ function startInstallation() {
 // View website function
 function viewWebsite() {
   const storeName = wizardData.storeInfo?.name || "Your Website";
+  const finalConfig = localStorage.getItem("finalInstallationConfig");
+
+  if (finalConfig) {
+    console.log("Final configuration saved:", JSON.parse(finalConfig));
+    // Here you could send the configuration to a server endpoint
+    // Example:
+    // fetch('/api/install', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: finalConfig
+    // });
+  }
+
   alert(`Opening ${storeName}...`);
 
   if (confirm("Would you like to create another website?")) {

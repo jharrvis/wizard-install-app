@@ -782,6 +782,18 @@ body {
   width: 100%;
 }
 
+/* Theme radio input - hidden */
+.theme-radio-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.theme-label {
+  display: block;
+  cursor: pointer;
+}
+
 .theme-item .theme-card {
   display: flex;
   align-items: center;
