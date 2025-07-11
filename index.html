@@ -595,15 +595,15 @@
                 <div class="font-selection">
                   <div class="font-item">
                     <div class="default-font-option">
-                      <input
-                        type="checkbox"
-                        id="useDefaultFont"
-                        checked
-                        onchange="toggleFontSelection()"
-                      />
-                      <label for="useDefaultFont" class="checkbox-label"
-                        >Use Default Theme Font</label
-                      >
+                      <label for="useDefaultFont" class="checkbox-label">
+                        <input
+                          type="checkbox"
+                          id="useDefaultFont"
+                          checked
+                          onchange="toggleFontSelection()"
+                        />
+                        Use Default Theme Font
+                      </label>
                     </div>
 
                     <div
@@ -612,13 +612,23 @@
                       style="display: none"
                     >
                       <label class="form-label">Custom Font Family</label>
-                      <input
-                        type="text"
-                        class="form-input"
-                        id="fontSearchInput"
-                        placeholder="Search Google fonts..."
-                        onchange="updateCustomFont()"
-                      />
+                      <div class="font-search-container">
+                        <div class="font-search-wrapper">
+                          <i class="fas fa-search font-search-icon"></i>
+                          <input
+                            type="text"
+                            class="font-search-input"
+                            id="fontSearchInput"
+                            placeholder="Search Google fonts..."
+                            onkeyup="searchGoogleFonts(this.value)"
+                            autocomplete="off"
+                          />
+                        </div>
+                        <div
+                          class="font-suggestions"
+                          id="fontSuggestions"
+                        ></div>
+                      </div>
                     </div>
                   </div>
                   <div class="font-preview-area">

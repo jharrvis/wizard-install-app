@@ -782,18 +782,6 @@ body {
   width: 100%;
 }
 
-/* Theme radio input - hidden */
-.theme-radio-input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.theme-label {
-  display: block;
-  cursor: pointer;
-}
-
 .theme-item .theme-card {
   display: flex;
   align-items: center;
@@ -1478,7 +1466,7 @@ input[type="radio"] {
 .guide-color {
   width: 4rem;
   height: 4rem;
-  border-radius: 0.5rem;
+  border-radius: 50%;
   flex-shrink: 0;
   border: 2px solid rgba(0, 0, 0, 0.1);
 }
@@ -1501,6 +1489,7 @@ input[type="radio"] {
 }
 
 /* Font Selection Updates */
+/* Font Selection Updates */
 .default-font-option {
   margin-bottom: 2rem;
 }
@@ -1511,16 +1500,109 @@ input[type="radio"] {
   cursor: pointer;
   display: flex;
   align-items: center;
-  margin-left: 1rem;
+  gap: 1rem;
 }
 
 #useDefaultFont {
-  margin-right: 1rem;
   transform: scale(1.2);
 }
 
 .custom-font-selection {
   margin-top: 2rem;
+}
+
+.font-search-container {
+  position: relative;
+  width: 100%;
+}
+
+.font-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.font-search-icon {
+  position: absolute;
+  left: 2rem;
+  color: #009bde;
+  font-size: 1.8rem;
+  z-index: 1;
+}
+
+.font-search-input {
+  width: 100%;
+  padding: 2rem 2rem 2rem 5rem;
+  border: 0.2rem solid rgba(0, 155, 222, 0.1);
+  border-radius: 2rem;
+  font: 500 1.6rem/1 "Montserrat", sans-serif;
+  color: #0f488a;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.font-search-input:focus {
+  outline: none;
+  border-color: #ff7101;
+  box-shadow: 0 0 0 0.3rem rgba(255, 113, 1, 0.1);
+}
+
+.font-search-input:focus + .font-search-icon {
+  color: #ff7101;
+}
+
+.font-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 0.2rem solid rgba(0, 155, 222, 0.1);
+  border-top: none;
+  border-radius: 0 0 2rem 2rem;
+  max-height: 25rem;
+  overflow-y: auto;
+  z-index: 10;
+  display: none;
+}
+
+.font-suggestions.show {
+  display: block;
+}
+
+.font-suggestion-item {
+  padding: 1.5rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 0.1rem solid rgba(0, 155, 222, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.font-suggestion-item:hover {
+  background: rgba(255, 113, 1, 0.05);
+  color: #ff7101;
+}
+
+.font-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.font-suggestion-name {
+  font: 500 1.6rem/1 "Montserrat", sans-serif;
+  color: #0f488a;
+  transition: all 0.3s ease;
+}
+
+.font-suggestion-preview {
+  font: 400 1.4rem/1 "Montserrat", sans-serif;
+  color: #666;
+  font-style: italic;
+}
+
+.font-suggestion-item:hover .font-suggestion-name {
+  color: #ff7101;
 }
 
 /* Sample Data Selection */
@@ -2015,9 +2097,9 @@ input[type="radio"] {
 
 .color-picker {
   width: 5rem;
-  height: 4rem;
+  height: 5rem;
   border: 2px solid rgba(0, 155, 222, 0.2);
-  border-radius: 0.5rem;
+  border-radius: 50% !important;
   cursor: pointer;
   transition: all 0.3s ease;
 }

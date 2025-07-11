@@ -197,6 +197,40 @@ const defaultPluginData = {
   },
 };
 
+// Popular Google Fonts list
+const popularGoogleFonts = [
+  "Open Sans",
+  "Roboto",
+  "Lato",
+  "Montserrat",
+  "Poppins",
+  "Source Sans Pro",
+  "Oswald",
+  "Raleway",
+  "Nunito",
+  "Playfair Display",
+  "Merriweather",
+  "Ubuntu",
+  "Roboto Condensed",
+  "Roboto Slab",
+  "PT Sans",
+  "Noto Sans",
+  "Libre Baskerville",
+  "Crimson Text",
+  "Work Sans",
+  "Fira Sans",
+  "Inter",
+  "Rubik",
+  "Quicksand",
+  "Barlow",
+  "Titillium Web",
+  "Cabin",
+  "Karla",
+  "Oxygen",
+  "Muli",
+  "Dosis",
+];
+
 // Initialize wizard
 $(document).ready(async function () {
   console.log("DOM Ready - Initializing wizard...");
@@ -717,23 +751,97 @@ function updateColorGuide() {
   }
 }
 
-// Font functions
-function updateFontFamily() {
-  const fontSelect = document.getElementById("fontFamilySelect");
-  const previewText = document.getElementById("fontPreviewText");
+// Font functions// Search Google Fonts function
+function searchGoogleFonts(query) {
+  const suggestionsContainer = document.getElementById("fontSuggestions");
 
-  const selectedFont = fontSelect.value;
-
-  if (selectedFont === "default") {
-    previewText.style.fontFamily = "Montserrat";
-  } else {
-    previewText.style.fontFamily = selectedFont;
+  if (!query || query.trim().length < 2) {
+    suggestionsContainer.classList.remove("show");
+    return;
   }
 
-  wizardData.styling.fonts = selectedFont;
+  const filteredFonts = popularGoogleFonts.filter((font) =>
+    font.toLowerCase().includes(query.toLowerCase())
+  );
+
+  if (filteredFonts.length === 0) {
+    suggestionsContainer.classList.remove("show");
+    return;
+  }
+
+  let suggestionsHTML = "";
+  filteredFonts.slice(0, 8).forEach((font) => {
+    suggestionsHTML += `
+      <div class="font-suggestion-item" onclick="selectGoogleFont('${font}')">
+        <div class="font-suggestion-name">${font}</div>
+        <div class="font-suggestion-preview" style="font-family: '${font}', sans-serif;">Sample Text</div>
+      </div>
+    `;
+  });
+
+  suggestionsContainer.innerHTML = suggestionsHTML;
+  suggestionsContainer.classList.add("show");
+}
+
+// Select Google Font function
+function selectGoogleFont(fontName) {
+  const fontInput = document.getElementById("fontSearchInput");
+  const suggestionsContainer = document.getElementById("fontSuggestions");
+
+  fontInput.value = fontName;
+  suggestionsContainer.classList.remove("show");
+
+  // Load the font from Google Fonts
+  loadGoogleFont(fontName);
+
+  // Update the font in wizard data
+  wizardData.styling.fonts = fontName;
+  wizardData.styling.useDefaultFont = false;
+
+  // Update preview
+  updateFontPreview(fontName);
+
   saveWizardData();
   updateSummary();
 }
+
+// Load Google Font function
+function loadGoogleFont(fontName) {
+  const fontLink = document.createElement("link");
+  fontLink.rel = "stylesheet";
+  fontLink.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(
+    /\s+/g,
+    "+"
+  )}:wght@300;400;500;600;700&display=swap`;
+
+  // Check if font is already loaded
+  const existingLink = document.querySelector(
+    `link[href*="${fontName.replace(/\s+/g, "+")}"]`
+  );
+  if (!existingLink) {
+    document.head.appendChild(fontLink);
+  }
+}
+
+// Update font preview function
+function updateFontPreview(fontName) {
+  const previewText = document.getElementById("fontPreviewText");
+  if (previewText) {
+    previewText.style.fontFamily = `'${fontName}', sans-serif`;
+  }
+}
+
+// Close suggestions when clicking outside
+document.addEventListener("click", function (event) {
+  const suggestionsContainer = document.getElementById("fontSuggestions");
+  const fontSearchInput = document.getElementById("fontSearchInput");
+
+  if (suggestionsContainer && fontSearchInput) {
+    if (!event.target.closest(".font-search-container")) {
+      suggestionsContainer.classList.remove("show");
+    }
+  }
+});
 
 // Update theme grid based on selected platform
 function updateThemeGrid() {
@@ -900,12 +1008,25 @@ function updateCustomFont() {
   const fontName = fontInput.value.trim();
 
   if (fontName) {
+    // Check if it's a popular Google Font
+    const isGoogleFont = popularGoogleFonts.some(
+      (font) => font.toLowerCase() === fontName.toLowerCase()
+    );
+
+    if (isGoogleFont) {
+      loadGoogleFont(fontName);
+      updateFontPreview(fontName);
+    } else {
+      // Use the font as-is (might be a system font)
+      updateFontPreview(fontName);
+    }
+
     wizardData.styling.fonts = fontName;
-    document.getElementById("fontPreviewText").style.fontFamily = fontName;
   } else {
     wizardData.styling.fonts = "default";
     document.getElementById("fontPreviewText").style.fontFamily = "Montserrat";
   }
+
   saveWizardData();
   updateSummary();
 }
@@ -1670,3 +1791,5 @@ window.selectSampleData = selectSampleData;
 window.toggleFontSelection = toggleFontSelection;
 window.updateCustomFont = updateCustomFont;
 window.viewWebsite = viewWebsite;
+window.searchGoogleFonts = searchGoogleFonts;
+window.selectGoogleFont = selectGoogleFont;
